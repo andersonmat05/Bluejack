@@ -1,4 +1,3 @@
-import javax.lang.model.type.NullType;
 import java.util.Random;
 
 
@@ -6,14 +5,14 @@ public class Deck {
     private Card[] cards;
 
     /**
-     * Generate empty deck.
+     * Generates empty deck.
      */
     public Deck() {
         cards = new Card[0];
     }
 
     /**
-     * Get a card at specified index.
+     * Get card at specified index.
      * @param index Index of the card.
      */
     public Card get(int index) {
@@ -21,8 +20,8 @@ public class Deck {
     }
 
     /**
-     * Set a card at specified index.
-     * @param card New card object.
+     * Replace card at specified index.
+     * @param card Card object.
      * @param index Index of the card.
      */
     public void set(Card card, int index) {
@@ -30,7 +29,8 @@ public class Deck {
     }
 
     /**
-     * Returns number of cards in the deck. Returns -1 if deck is empty
+     * Returns index of the last card in the deck.
+     * Returns -1 if deck is empty.
      */
     public int getLastIndex() {
         return cards.length-1;
@@ -43,7 +43,8 @@ public class Deck {
     }
 
     /**
-     * Append a new card to the end of the deck. Returns index of the new card.
+     * Append a new card to the end of the deck.
+     * Returns index of the new card.
      * @param card Card to append
      */
     public int add(Card card) {
@@ -60,7 +61,8 @@ public class Deck {
     }
 
     /**
-     * Remove the card at specified index. Returns the card removed.
+     * Remove the card at specified index.
+     * Returns the card removed.
      * @param index Index of the card to remove
      */
     public Card remove(int index) {
@@ -83,18 +85,19 @@ public class Deck {
     }
 
     /**
-     * Remove all cards from the deck
+     * Remove all cards from the deck.
      */
     public void clear() {
         cards = new Card[0];
     }
 
     /**
-     * Shuffle existing cards in the deck using Fisher–Yates shuffle algorithm
+     * Shuffle cards in the deck using Fisher–Yates shuffle algorithm.
      */
     public void shuffle() {
         Random rand = new Random();
 
+        /* Iterate through the array starting from the last element */
         for (int i = cards.length-1; i > 0; i--) {
 
             /* Pick a random index from 0 to i */
@@ -105,5 +108,16 @@ public class Deck {
             cards[i] = cards[j];
             cards[j] = temp;
         }
+    }
+
+    /**
+     * Returns the sum of all values inside the deck.
+     */
+    public int sumValues() {
+        int sum = 0;
+        for (Card card : cards) {
+            sum += card.value;
+        }
+        return sum;
     }
 }

@@ -12,6 +12,7 @@ public class Main {
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    //todo: not implemented yet
     public static final int BOARD_SIZE = 9;
 
     public static Deck gameDeck = new Deck();
@@ -109,15 +110,17 @@ public class Main {
             computerDeck.add(Card.randomSignedCard(i));
         }
 
+        /* Shuffle the decks so the cards drawn are random */
         playerDeck.shuffle();
         computerDeck.shuffle();
 
-        /* Draw 4 random cards from each players deck to be their hand */
+        /* Draw the first 4 cards from each players deck to be their hand */
         for (int i = 0; i < 4; i++) {
             playerHand.add(playerDeck.remove(i));
             computerHand.add(computerDeck.remove(i));
         }
 
+        /* Make sure there is nothing left on the board */
         playerBoard.clear();
         computerBoard.clear();
     }
@@ -127,14 +130,27 @@ public class Main {
      * Player actions. Returns true if player chose to stand.
      */
     public static boolean playerTurn() {
+        /* Draw the top card from the game deck and place it on player board */
         playerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
+
+        /* Display the game so player can act accordingly. */
+        //todo: the function to display the game will be replaced
         printGame();
+
         Scanner sc = new Scanner(System.in);
-        System.out.print("\nChoose action\n0: end  1: card  2: stand\n> ");
+
+        /* Prompt the player to choose an action. */
+        //todo: formatting may be updated, change numbers to letters?
+        //todo: check for range
+        System.out.print("\nChoose action\n0: End  1: Play Card  2: Stand\n> ");
         int input = sc.nextInt();
-        if(input == 0) {
+
+        if (input == 0) {
+            /* If player chooses to end the turn, we simply return false
+            * so game knows player is not standing yet. */
             return false;
         } else if (input == 1) {
+            //todo: check for range
             System.out.print("Choose card index\n> ");
             int cardIndex = sc.nextInt();
             playCard(playerHand.remove(cardIndex), playerBoard);
@@ -162,6 +178,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        //todo: a main menu to change settings? and enter a player name
         initGame();
 
         boolean playerStand = false;
