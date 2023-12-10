@@ -1,3 +1,4 @@
+import javax.lang.model.type.NullType;
 import java.util.Random;
 
 
@@ -20,7 +21,16 @@ public class Deck {
     }
 
     /**
-     * Returns number of cards in the deck.
+     * Set a card at specified index.
+     * @param card New card object.
+     * @param index Index of the card.
+     */
+    public void set(Card card, int index) {
+        cards[index] = card;
+    }
+
+    /**
+     * Returns number of cards in the deck. Returns -1 if deck is empty
      */
     public int getLastIndex() {
         return cards.length-1;

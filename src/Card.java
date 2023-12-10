@@ -2,10 +2,13 @@ import java.util.Random;
 
 
 public class Card {
-    public int value;
+    public int value; // 0: Null
 
     public int type; // 0: Blue, 1: Yellow, 2: Red, 3: Green, 4 Flip, 5, Double
 
+    /**
+     * Default constructor
+     */
     public Card(int value, int type) {
         this.value = value;
         this.type = type;
