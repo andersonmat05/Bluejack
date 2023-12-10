@@ -1,4 +1,16 @@
 public class Main {
+
+    // For testing purposes
+    @Deprecated
+    public static void printDeck(Deck deck) {
+        Card[] a = deck.getArray();
+        for(Card c : a)
+        {
+            System.out.print("[" + c.value + "," + c.color + "]");
+        }
+        System.out.println();
+    }
+
     public static void main(String[] args) {
 
         Deck gameDeck = new Deck();
@@ -8,8 +20,6 @@ public class Main {
             }
         }
 
-        // Testing class functionality
-
         Deck d = new Deck();
         Deck q = new Deck(10);
 
@@ -17,17 +27,14 @@ public class Main {
         d.append(new Card(2,2));
         d.append(new Card(3,1));
 
-        Card[] a = d.getArray();
-        for(Card c : a)
-        {
-            System.out.print("[" + c.value + "," + c.color + "]");
-        }
-        d.remove(0);
+        printDeck(d);
+        d.remove(1);
+        printDeck(d);
+        printDeck(q);
+        q.clear();
         System.out.println();
-        Card[] b = d.getArray();
-        for(Card c : b)
-        {
-            System.out.print("[" + c.value + "," + c.color + "]");
-        }
+        printDeck(gameDeck);
+        gameDeck.shuffle();
+        printDeck(gameDeck);
     }
 }

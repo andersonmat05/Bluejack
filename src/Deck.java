@@ -89,9 +89,20 @@ public class Deck {
     }
 
     /**
-     * Shuffle existing cards in the deck
+     * Shuffle existing cards in the deck using Fisher–Yates shuffle algorithm
      */
     public void shuffle() {
-        //todo
+        Random rand = new Random();
+
+        for (int i = cards.length-1; i > 0; i--) {
+
+            /* Pick a random index from 0 to i */
+            int j = rand.nextInt(i+1);
+
+            /* Swap element at i with random index */
+            Card temp = cards[i];
+            cards[i] = cards[j];
+            cards[j] = temp;
+        }
     }
 }
