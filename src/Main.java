@@ -13,7 +13,6 @@ public class Main {
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    //todo: not implemented yet
     public static final int BOARD_SIZE = 9;
 
     public static Deck gameDeck = new Deck();
@@ -25,6 +24,26 @@ public class Main {
     public static Deck computerDeck = new Deck();
     public static Deck computerHand = new Deck();
     public static Deck computerBoard = new Deck();
+
+    /**
+     * Prompts user to enter an integer within a range.
+     * @param range The range of input is between 0 and range, both inclusive.
+     */
+    private static int getInput(int range) {
+        Scanner scan = new Scanner(System.in);
+        while (true) {
+            try {
+                System.out.print("> ");
+                int input = scan.nextInt();
+                if (input >= 0 && input <= range) {
+                    return input;
+                }
+            } catch (java.util.InputMismatchException e) {
+                scan.next();
+            }
+            System.out.print("  invalid input, please enter again.\n");
+        }
+    }
 
     // For testing purposes
     @Deprecated
@@ -138,24 +157,26 @@ public class Main {
         //todo: the function to display the game will be replaced
         printGame();
 
-        Scanner sc = new Scanner(System.in);
+        Scanner scan = new Scanner(System.in);
 
         /* Prompt the player to choose an action. */
-        //todo: formatting may be updated, change numbers to letters?
         //todo: check for range
-        System.out.print("\nChoose action\n0: End  1: Play Card  2: Stand\n> ");
-        int input = sc.nextInt();
+        int action = 0;
 
-        if (input == 0) {
+        System.out.println("\nChoose action\n0: End  1: Play Card  2: Stand");
+        action = getInput(2);
+
+
+        if (action == 0) {
             /* If player chooses to end the turn, we simply return false
             * so game knows player is not standing yet. */
             return false;
-        } else if (input == 1) {
+        } else if (action == 1) {
             //todo: check for range
-            System.out.print("Choose card index\n> ");
-            int cardIndex = sc.nextInt();
+            System.out.println("Choose card index");
+            int cardIndex = getInput(playerHand.getLastIndex());
             playCard(playerHand.remove(cardIndex), playerBoard);
-        } else if (input == 2) {
+        } else if (action == 2) {
             return true;
         }
         return false;
@@ -269,10 +290,14 @@ public class Main {
             if(playerStand && computerStand) {
                 System.out.println(20 - playerBoard.sumValues());
                 System.out.println(20 - computerBoard.sumValues());
-                if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
+                if (playerBoard.sumValues() == computerBoard.sumValues()) {
+                    System.out.println("tie");
+                } else if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
                     playerSet++;
+                    System.out.println("player wins the set");
                 } else {
                     computerSet++;
+                    System.out.println("computer wins the set");
                 }
             }
 
