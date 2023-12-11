@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 
@@ -70,13 +71,13 @@ public class Main {
 
     @Deprecated
     public static void printGame() {
-        System.out.print("\nComputer Hand : ");
+        System.out.print("\nComputer Hand      : ");
         printDeck(computerHand);
-        System.out.print("\nComputer Board: ");
+        System.out.print("\nComputer Board (" + String.format("%02d", computerBoard.sumValues()) + "): ");
         printDeck(computerBoard);
-        System.out.print("\nPlayer Board  : ");
+        System.out.print("\nPlayer Board   (" + String.format("%02d", playerBoard.sumValues()) + "): ");
         printDeck(playerBoard);
-        System.out.print("\nPlayer Hand   : ");
+        System.out.print("\nPlayer Hand        : ");
         printDeck(playerHand);
     }
 
@@ -129,7 +130,7 @@ public class Main {
     /**
      * Player actions. Returns true if player chose to stand.
      */
-    public static boolean playerTurn() {
+    public static boolean playerAction() {
         /* Draw the top card from the game deck and place it on player board */
         playerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
 
@@ -160,8 +161,22 @@ public class Main {
         return false;
     }
 
-    public static boolean computerTurn() {
+    /**
+     * Computer actions and logic. Returns true if computer chose to stand.
+     */
+    public static boolean computerAction() {
         computerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
+        Random rand = new Random();
+        if(rand.nextFloat() < 0.1f) {
+            System.out.println("computer stands");
+            return true;
+        }
+        if(rand.nextFloat() < 0.3) {
+            System.out.println("computer plays a card");
+            if (computerHand.getLastIndex() != -1)
+                playCard(computerHand.remove(rand.nextInt(computerHand.getLastIndex())), computerBoard);
+        }
+        System.out.println("computer ends the turn");
         return false;
     }
 
@@ -177,18 +192,101 @@ public class Main {
         }
     }
 
+    /**
+     * Returns true if sum of values is 20 and all cards are blue
+     */
+    public static boolean checkBluejack(Deck board) {
+        if(board.sumValues() != 20) {
+            return false;
+        }
+        boolean isAllBlue = true;
+        for (int i = 0; i < board.getLastIndex() + 1; i++) {
+            if (board.get(i).type != 0)
+                isAllBlue = false;
+        }
+        return isAllBlue;
+    }
+
     public static void main(String[] args) {
         //todo: a main menu to change settings? and enter a player name
         initGame();
+        int playerSet = 0;
+        int computerSet = 0;
 
-        boolean playerStand = false;
-        boolean computerStand = false;
+        /* The main game loop */
+        while (playerSet < 3 && computerSet < 3) {
+            System.out.println("\n      SET BEGIN");
 
-        do {
-            if (!playerStand)
-                playerStand = playerTurn();
-            if (!computerStand)
-                computerStand = computerTurn();
-        } while (!playerStand || !computerStand);
+            playerBoard.clear();
+            computerBoard.clear();
+            boolean playerStand = false;
+            boolean computerStand = false;
+            /* Game loop for a set */
+            do {
+                /* Player turn */
+                if (!playerStand) {
+                    playerStand = playerAction();
+                    if (playerBoard.sumValues() > 20) {
+                        computerSet++;
+                        System.out.println("Player busted");
+                        break;
+                    }
+                    if (checkBluejack(playerBoard)) {
+                        playerSet = 3;
+                        System.out.println("Bluejack!");
+                        break;
+                    }
+                    /* Player sum is obviously less or equal to 20 if they
+                    * did not get caught in the statement above */
+                    if (playerBoard.getLastIndex()+1 == BOARD_SIZE) {
+                        playerSet++;
+                        break;
+                    }
+                }
+
+                /* Computer turn */
+                if (!computerStand) {
+                    computerStand = computerAction();
+                    if (computerBoard.sumValues() > 20) {
+                        playerSet++;
+                        System.out.println("Computer busted");
+                        break;
+                    }
+                    if (checkBluejack(computerBoard)) {
+                        computerSet = 3;
+                        System.out.println("Bluejack!");
+                        break;
+                    }
+                    if (computerBoard.getLastIndex()+1 == BOARD_SIZE) {
+                        computerSet++;
+                        break;
+                    }
+                }
+            } while (!(playerStand && computerStand));
+
+            /* Set ended */
+
+            if(playerStand && computerStand) {
+                System.out.println(20 - playerBoard.sumValues());
+                System.out.println(20 - computerBoard.sumValues());
+                if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
+                    playerSet++;
+                } else {
+                    computerSet++;
+                }
+            }
+
+            printGame();
+            System.out.println();
+            System.out.println(playerSet + "-" + computerSet);
+        }
+
+        if (playerSet == 3) {
+            System.out.println("PLAYER WINS");
+        } else {
+            System.out.println("CPU WINS");
+        }
+
+        /* Game ended */
     }
 }

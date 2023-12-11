@@ -2,6 +2,9 @@ import java.util.Random;
 
 
 public class Card {
+
+    /* Actual value of the card, used for both signed and regular cards.
+    * 0 for special cards. */
     public int value;
 
     /* Used for storing both the color and special card type.
