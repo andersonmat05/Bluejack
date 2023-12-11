@@ -187,6 +187,7 @@ public class Main {
      */
     public static boolean computerAction() {
         computerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
+        //todo: add actual logic
         Random rand = new Random();
         if(rand.nextFloat() < 0.1f) {
             System.out.println("computer stands");
@@ -194,8 +195,11 @@ public class Main {
         }
         if(rand.nextFloat() < 0.3) {
             System.out.println("computer plays a card");
-            if (computerHand.getLastIndex() != -1)
+            if (computerHand.getLastIndex() > 0) {
                 playCard(computerHand.remove(rand.nextInt(computerHand.getLastIndex())), computerBoard);
+            } else if (computerHand.getLastIndex() == 0) {
+                playCard(computerHand.remove(0), computerBoard);
+            }
         }
         System.out.println("computer ends the turn");
         return false;
