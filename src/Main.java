@@ -4,14 +4,14 @@ import java.util.Scanner;
 
 public class Main {
 
-    // Color codes for terminal
-    //todo: does not work in cmd or power shell
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_WHITE = "\u001B[37m";
+
+    //todo: ask the user upon init
+    public static boolean colorEnabled = false;
 
     public static final int BOARD_SIZE = 9;
 
@@ -27,15 +27,16 @@ public class Main {
 
     /**
      * Prompts user to enter an integer within a range.
-     * @param range The range of input is between 0 and range, both inclusive.
+     * @param min Minimum value expected from user to enter, inclusive.
+     * @param max Maximum value expected from user to enter, inclusive.
      */
-    private static int getInput(int range) {
+    private static int getInput(int min, int max) {
         Scanner scan = new Scanner(System.in);
         while (true) {
             try {
                 System.out.print("> ");
                 int input = scan.nextInt();
-                if (input >= 0 && input <= range) {
+                if (input >= min && input <= max) {
                     return input;
                 }
             } catch (java.util.InputMismatchException e) {
@@ -46,7 +47,7 @@ public class Main {
     }
 
     // For testing purposes
-    @Deprecated
+    //todo: re-implement without deprecated methods.
     public static void printDeck(Deck deck) {
         if(deck.getLastIndex() == -1) {
             System.out.print("Empty");
@@ -78,9 +79,9 @@ public class Main {
                     break;
             }
             if(c.isFlip()) {
-                System.out.print(ANSI_WHITE + "[" + "+-" + "]");
+                System.out.print(ANSI_RESET + "[" + "+-" + "]");
             } else if (c.isDouble()) {
-                System.out.print(ANSI_WHITE + "[" + "x2" + "]");
+                System.out.print(ANSI_RESET + "[" + "x2" + "]");
             } else {
                 System.out.print("[" + String.format("%02d", c.value) + "]");
             }
@@ -88,7 +89,8 @@ public class Main {
         System.out.print(ANSI_RESET);
     }
 
-    @Deprecated
+
+    //todo: clean up and hide opponent deck.
     public static void printGame() {
         System.out.print("\nComputer Hand      : ");
         printDeck(computerHand);
@@ -99,6 +101,7 @@ public class Main {
         System.out.print("\nPlayer Hand        : ");
         printDeck(playerHand);
     }
+
 
     /**
      * Set up game and player decks.
@@ -140,7 +143,7 @@ public class Main {
             computerHand.add(computerDeck.remove(i));
         }
 
-        /* Make sure there is nothing left on the board */
+        /* Make sure there is nothing on the board */
         playerBoard.clear();
         computerBoard.clear();
     }
@@ -157,29 +160,40 @@ public class Main {
         //todo: the function to display the game will be replaced
         printGame();
 
-        Scanner scan = new Scanner(System.in);
+        /* Put the user in a loop until action completes */
+        while (true) {
 
-        /* Prompt the player to choose an action. */
-        //todo: check for range
-        int action = 0;
+            /* Prompt the player to choose an action. If they don't have
+            * any cards in their hand, do not show the play card option */
+            int action;
+            if (playerHand.getLastIndex() == -1) {
+                System.out.println("\nChoose action\n0: End  1: Stand");
+                action = getInput(0, 1);
+            } else {
+                System.out.println("\nChoose action\n0: End  1: Stand  2: Play Card");
+                action = getInput(0, 2);
+            }
 
-        System.out.println("\nChoose action\n0: End  1: Play Card  2: Stand");
-        action = getInput(2);
-
-
-        if (action == 0) {
-            /* If player chooses to end the turn, we simply return false
-            * so game knows player is not standing yet. */
-            return false;
-        } else if (action == 1) {
-            //todo: check for range
-            System.out.println("Choose card index");
-            int cardIndex = getInput(playerHand.getLastIndex());
-            playCard(playerHand.remove(cardIndex), playerBoard);
-        } else if (action == 2) {
-            return true;
+            if (action == 0) {
+                /* If player chooses to end the turn, we simply return false
+                 * so game knows player is not standing yet. */
+                return false;
+            } else if (action == 1) {
+                /* Return true so game loop knows player is standing. */
+                return true;
+            } else if (action == 2) {
+                /* Prompt user to choose a card index */
+                System.out.println("Choose card index (-1 to cancel)");
+                int cardIndex = getInput(-1, playerHand.getLastIndex());
+                if(cardIndex == -1) {
+                    /* Play card canceled, return back to action selection */
+                    continue;
+                }
+                /* User chose a valid card to play, play the card and end the turn. */
+                playCard(playerHand.remove(cardIndex), playerBoard);
+                return false;
+            }
         }
-        return false;
     }
 
     /**

@@ -44,10 +44,8 @@ public class Deck {
 
     /**
      * Append a new card to the end of the deck.
-     * Returns index of the new card.
-     * @param card Card to append
      */
-    public int add(Card card) {
+    public void add(Card card) {
         /* Size of the original array */
         int n = cards.length;
         Card[] newCards = new Card[n+1];
@@ -57,7 +55,6 @@ public class Deck {
         newCards[n] = card;
         /* Reflect result to original array */
         cards = newCards;
-        return n;
     }
 
     /**
