@@ -4,12 +4,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-
     //todo: ask the user upon init
     public static boolean colorEnabled = false;
 
@@ -46,60 +40,29 @@ public class Main {
         }
     }
 
-    // For testing purposes
-    //todo: re-implement without deprecated methods.
-    public static void printDeck(Deck deck) {
-        if(deck.getLastIndex() == -1) {
-            System.out.print("Empty");
-            return;
-        }
-
-        Card[] a = deck.getArray();
-        for(Card c : a)
-        {
-            switch (c.type) {
-                case 0:
-                    // Blue
-                    System.out.print(ANSI_BLUE);
-                    break;
-                case 1:
-                    // Yellow
-                    System.out.print(ANSI_YELLOW);
-                    break;
-                case 2:
-                    // Red
-                    System.out.print(ANSI_RED);
-                    break;
-                case 3:
-                    // Green
-                    System.out.print(ANSI_GREEN);
-                    break;
-                default:
-                    System.out.print(ANSI_RESET);
-                    break;
-            }
-            if(c.isFlip()) {
-                System.out.print(ANSI_RESET + "[" + "+-" + "]");
-            } else if (c.isDouble()) {
-                System.out.print(ANSI_RESET + "[" + "x2" + "]");
-            } else {
-                System.out.print("[" + String.format("%02d", c.value) + "]");
+    /**
+     * Print out boards and hands of both the computer and player.
+     * @param showComputerHand Whether to hide or show computer hand.
+     */
+    public static void displayGame(boolean showComputerHand) {
+        System.out.print("\nCPU Hand         : ");
+        if (showComputerHand) {
+            computerHand.print(colorEnabled);
+        } else {
+            for (int i = 0; i <= computerHand.getLastIndex(); i++) {
+                if (colorEnabled) {
+                    System.out.print("[??]");
+                } else {
+                    System.out.print("[???]");
+                }
             }
         }
-        System.out.print(ANSI_RESET);
-    }
-
-
-    //todo: clean up and hide opponent deck.
-    public static void printGame() {
-        System.out.print("\nComputer Hand      : ");
-        printDeck(computerHand);
-        System.out.print("\nComputer Board (" + String.format("%02d", computerBoard.sumValues()) + "): ");
-        printDeck(computerBoard);
-        System.out.print("\nPlayer Board   (" + String.format("%02d", playerBoard.sumValues()) + "): ");
-        printDeck(playerBoard);
-        System.out.print("\nPlayer Hand        : ");
-        printDeck(playerHand);
+        System.out.print("\nCPU Board    (" + String.format("%02d", computerBoard.sumValues()) + "): ");
+        computerBoard.print(colorEnabled);
+        System.out.print("\nPlayer Board (" + String.format("%02d", playerBoard.sumValues()) + "): ");
+        playerBoard.print(colorEnabled);
+        System.out.print("\nPlayer Hand      : ");
+        playerHand.print(colorEnabled);
     }
 
 
@@ -158,7 +121,8 @@ public class Main {
 
         /* Display the game so player can act accordingly. */
         //todo: the function to display the game will be replaced
-        printGame();
+        displayGame(false);
+        System.out.println();
 
         /* Put the user in a loop until action completes */
         while (true) {
@@ -167,10 +131,10 @@ public class Main {
             * any cards in their hand, do not show the play card option */
             int action;
             if (playerHand.getLastIndex() == -1) {
-                System.out.println("\nChoose action\n0: End  1: Stand");
+                System.out.println("Choose action\n0: End  1: Stand");
                 action = getInput(0, 1);
             } else {
-                System.out.println("\nChoose action\n0: End  1: Stand  2: Play Card");
+                System.out.println("Choose action\n0: End  1: Stand  2: Play Card");
                 action = getInput(0, 2);
             }
 
@@ -251,10 +215,11 @@ public class Main {
         initGame();
         int playerSet = 0;
         int computerSet = 0;
+        int setNum = 1;
 
         /* The main game loop */
         while (playerSet < 3 && computerSet < 3) {
-            System.out.println("\n      SET BEGIN");
+            System.out.println("\n ==== SET " + setNum + " ==== ");
 
             playerBoard.clear();
             computerBoard.clear();
@@ -267,7 +232,7 @@ public class Main {
                     playerStand = playerAction();
                     if (playerBoard.sumValues() > 20) {
                         computerSet++;
-                        System.out.println("Player busted");
+                        System.out.println("Player busted!");
                         break;
                     }
                     if (checkBluejack(playerBoard)) {
@@ -288,7 +253,7 @@ public class Main {
                     computerStand = computerAction();
                     if (computerBoard.sumValues() > 20) {
                         playerSet++;
-                        System.out.println("Computer busted");
+                        System.out.println("CPU busted!");
                         break;
                     }
                     if (checkBluejack(computerBoard)) {
@@ -309,17 +274,17 @@ public class Main {
                 System.out.println(20 - playerBoard.sumValues());
                 System.out.println(20 - computerBoard.sumValues());
                 if (playerBoard.sumValues() == computerBoard.sumValues()) {
-                    System.out.println("tie");
+                    System.out.println("Tie");
                 } else if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
                     playerSet++;
-                    System.out.println("player wins the set");
+                    System.out.println("Player wins the set");
                 } else {
                     computerSet++;
-                    System.out.println("computer wins the set");
+                    System.out.println("CPU wins the set");
                 }
             }
 
-            printGame();
+            displayGame(true);
             System.out.println();
             System.out.println(playerSet + "-" + computerSet);
         }
