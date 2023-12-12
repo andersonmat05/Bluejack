@@ -4,7 +4,7 @@ import java.util.Random;
 public class Deck {
     private Card[] cards;
 
-    /* Escape codes used in print methods. */
+    /* Escape codes used in print method. */
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_GREEN = "\u001B[32m";

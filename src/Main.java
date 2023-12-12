@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class Main {
 
-    //todo: ask the user upon init
     public static boolean colorEnabled = false;
 
     public static final int BOARD_SIZE = 9;
@@ -120,7 +119,6 @@ public class Main {
         playerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
 
         /* Display the game so player can act accordingly. */
-        //todo: the function to display the game will be replaced
         displayGame(false);
         System.out.println();
 
@@ -211,7 +209,22 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        //todo: a main menu to change settings? and enter a player name
+
+        System.out.println("0: Disable colors  1: Enable colors");
+        colorEnabled = getInput(0, 1) == 1;
+
+        if (colorEnabled)
+            System.out.print("\033[1;94m");
+        System.out.println("   WELCOME TO BLUEJACK");
+        if (colorEnabled)
+            System.out.print("\u001B[0m");
+
+        Scanner nameScanner = new Scanner(System.in);
+        System.out.print("Enter player name\n> ");
+        String playerName = nameScanner.next().trim();
+
+        System.out.println("Dealing hands...");
+
         initGame();
         int playerSet = 0;
         int computerSet = 0;
@@ -277,16 +290,28 @@ public class Main {
                     System.out.println("Tie");
                 } else if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
                     playerSet++;
-                    System.out.println("Player wins the set");
+                    System.out.print("   ");
+                    if (colorEnabled)
+                        System.out.print("\033[1;90m" + "\033[42m");
+                    System.out.print("   Player wins the set");
+                    if (colorEnabled)
+                        System.out.println("\u001B[0m");
                 } else {
                     computerSet++;
-                    System.out.println("CPU wins the set");
+                    System.out.print("   ");
+                    if (colorEnabled)
+                        System.out.print("\033[1;90m" + "\033[41m");
+                    System.out.print("CPU wins the set");
+                    if (colorEnabled) {
+                        System.out.println("\u001B[0m");
+                    }
                 }
             }
 
             displayGame(true);
             System.out.println();
             System.out.println(playerSet + "-" + computerSet);
+            setNum++;
         }
 
         if (playerSet == 3) {
