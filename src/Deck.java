@@ -4,19 +4,6 @@ import java.util.Random;
 public class Deck {
     private Card[] cards;
 
-    /* Escape codes used in print method. */
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-
-    private static boolean colorEnabled;
-
-    public static void setColorEnabled(boolean newEnabled) {
-        colorEnabled = newEnabled;
-    }
-
     /**
      * Generates empty deck.
      */
@@ -127,9 +114,8 @@ public class Deck {
 
     /**
      * Prints out all the cards present in the deck.
-     * @param color Whether to use ANSI color codes.
      */
-    public void print(boolean color) {
+    public void print() {
 
         /* End the method here if no cards are present */
         if(cards.length == 0) {
@@ -139,45 +125,45 @@ public class Deck {
 
         for(Card card : cards)
         {
-            if (color) {
+            if (SystemManager.colorEnabled) {
                 switch (card.type) {
                     case 0:
                         // Blue
-                        System.out.print(ANSI_BLUE);
+                        System.out.print(SystemManager.ANSI_BLUE);
                         break;
                     case 1:
                         // Yellow
-                        System.out.print(ANSI_YELLOW);
+                        System.out.print(SystemManager.ANSI_YELLOW);
                         break;
                     case 2:
                         // Red
-                        System.out.print(ANSI_RED);
+                        System.out.print(SystemManager.ANSI_RED);
                         break;
                     case 3:
                         // Green
-                        System.out.print(ANSI_GREEN);
+                        System.out.print(SystemManager.ANSI_GREEN);
                         break;
                     default:
                         // Special
-                        System.out.print(ANSI_RESET);
+                        System.out.print(SystemManager.ANSI_RESET);
                         break;
                 }
             }
             if (card.isFlip()) {
-                if (color) {
+                if (SystemManager.colorEnabled) {
                     System.out.print("[+-]");
                 } else {
                     System.out.print("[+- ]");
                 }
             } else if (card.isDouble()) {
-                if (color) {
+                if (SystemManager.colorEnabled) {
                     System.out.print("[x2]");
                 } else {
                     System.out.print("[2x ]");
                 }
             } else {
                 System.out.print("[" + String.format("%02d", card.value));
-                if (!color) {
+                if (!SystemManager.colorEnabled) {
                     switch (card.type) {
                         case 0:
                             // Blue
@@ -202,8 +188,8 @@ public class Deck {
                 System.out.print("]");
             }
         }
-        if (color) {
-            System.out.print(ANSI_RESET);
+        if (SystemManager.colorEnabled) {
+            System.out.print(SystemManager.ANSI_RESET);
         }
     }
 }

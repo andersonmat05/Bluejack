@@ -1,29 +1,21 @@
 public class Player {
 
-    private static final String ANSI_WHITE_BOLD = "\033[1;97m";
-    private static final String ANSI_RESET = "\u001B[0m";
-
     public String name;
-    public String color;
+    private final String color;
 
     public Deck deck;
     public Deck board;
     public Deck hand;
 
     private int set;
-    private static boolean colorEnabled;
 
-    public Player(String name) {
+    public Player(String name, String color) {
         this.name = name;
+        this.color = color;
         this.deck = new Deck();
         this.board = new Deck();
         this.hand = new Deck();
         this.set = 0;
-        colorEnabled = false;
-    }
-
-    public static void setColorEnabled(boolean newEnabled) {
-        colorEnabled = newEnabled;
     }
 
     public int getSet() {
@@ -32,24 +24,13 @@ public class Player {
 
     public void winSet() {
         set++;
-        System.out.print("   ");
-        if (colorEnabled)
-            System.out.print(color + ANSI_WHITE_BOLD);
-        System.out.print("   " + name + " wins the set!   ");
-        /* Reset color */
-        if (colorEnabled)
-            System.out.print(ANSI_RESET);
-        System.out.println();
+        System.out.print("\n   ");
+        SystemManager.println("   " + name + " wins the set!   ", color + SystemManager.ANSI_WHITE_BOLD);
     }
 
     public void winGame() {
         set = 3;
-        if (colorEnabled)
-            System.out.print(color + ANSI_WHITE_BOLD);
-        System.out.print("   " + name + " wins the game!   ");
-        /* Reset color */
-        if (colorEnabled)
-            System.out.print(ANSI_RESET);
-        System.out.println();
+        System.out.print("\n   ");
+        SystemManager.println("   " + name + " wins the game!   ", color + SystemManager.ANSI_WHITE_BOLD);
     }
 }

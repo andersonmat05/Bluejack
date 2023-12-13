@@ -1,69 +1,25 @@
-import java.util.Scanner;
-
-
 public class Main {
-
-    public static boolean colorEnabled = false;
-
-    public static final String ANSI_POSITIVE = "\033[42m";
-    public static final String ANSI_NEGATIVE = "\033[41m";
-
-    public static final String PLAYER_SET = "  Player wins the set  ";
-    public static final String CPU_SET = "  CPU wins the set  ";
 
     public static final int BOARD_SIZE = 9;
 
     public static Deck gameDeck = new Deck();
 
-    public static Player user = new Player("Player");
+    public static Player user = new Player("Player", SystemManager.ANSI_POSITIVE_BG);
 
-    public static Player cpu = new Player("CPU");
-
-    private static void printColor(String string, String code) {
-        if (colorEnabled)
-            System.out.print(code);
-        System.out.print(string);
-        /* Reset color */
-        if (colorEnabled)
-            System.out.print("\u001B[0m");
-        System.out.println();
-    }
-
-    /**
-     * Prompts user to enter an integer within a range.
-     * @param min Minimum value expected from user to enter, inclusive.
-     * @param max Maximum value expected from user to enter, inclusive.
-     */
-    private static int getInput(int min, int max) {
-        Scanner scan = new Scanner(System.in);
-        /* Keep user in the loop until valid input is entered */
-        while (true) {
-            try {
-                System.out.print("> ");
-                int input = scan.nextInt();
-                /* Check for range */
-                if (input >= min && input <= max) {
-                    return input;
-                }
-            } catch (java.util.InputMismatchException e) {
-                /* Consume the input */
-                scan.next();
-            }
-            System.out.print("  Invalid input, please enter again.\n");
-        }
-    }
+    public static Player cpu = new Player("CPU", SystemManager.ANSI_NEGATIVE_BG);
 
     /**
      * Print out boards and hands of both the computer and player.
      * @param showComputerHand Whether to hide or show computer hand.
      */
     public static void displayGame(boolean showComputerHand) {
+        //todo: change to player names & auto align spaces
         System.out.print("\nCPU Hand         : ");
         if (showComputerHand) {
-            cpu.hand.print(colorEnabled);
+            cpu.hand.print();
         } else {
             for (int i = 0; i <= cpu.hand.getLastIndex(); i++) {
-                if (colorEnabled) {
+                if (SystemManager.colorEnabled) {
                     System.out.print("[??]");
                 } else {
                     System.out.print("[???]");
@@ -71,21 +27,17 @@ public class Main {
             }
         }
         System.out.print("\nCPU Board    (" + String.format("%02d", cpu.board.sumValues()) + "): ");
-        cpu.board.print(colorEnabled);
+        cpu.board.print();
         System.out.print("\nPlayer Board (" + String.format("%02d", user.board.sumValues()) + "): ");
-        user.board.print(colorEnabled);
+        user.board.print();
         System.out.print("\nPlayer Hand      : ");
-        user.hand.print(colorEnabled);
+        user.hand.print();
     }
-
 
     /**
      * Set up game and player decks.
      */
     public static void initGame() {
-
-        user.color = ANSI_POSITIVE;
-        cpu.color = ANSI_NEGATIVE;
 
         /* Create the game deck and shuffle */
         for (int color = 0; color <= 3; color++) {
@@ -132,9 +84,9 @@ public class Main {
     /**
      * Player actions. Returns true if player chose to stand.
      */
-    public static boolean playerAction() {
+    public static boolean playerAction(Player player) {
         /* Draw the top card from the game deck and place it on player board */
-        user.board.add(gameDeck.remove(gameDeck.getLastIndex()));
+        player.board.add(gameDeck.remove(gameDeck.getLastIndex()));
 
         /* Display the game so player can act accordingly. */
         displayGame(false);
@@ -146,12 +98,12 @@ public class Main {
             /* Prompt the player to choose an action. If they don't have
             * any cards in their hand, do not show the play card option */
             int action;
-            if (user.hand.getLastIndex() == -1) {
+            if (player.hand.getLastIndex() == -1) {
                 System.out.println("Choose action\n0: End  1: Stand");
-                action = getInput(0, 1);
+                action = SystemManager.scanIntRange(0, 1);
             } else {
                 System.out.println("Choose action\n0: End  1: Stand  2: Play Card");
-                action = getInput(0, 2);
+                action = SystemManager.scanIntRange(0, 2);
             }
 
             if (action == 0) {
@@ -164,13 +116,13 @@ public class Main {
             } else if (action == 2) {
                 /* Prompt user to choose a card index */
                 System.out.println("Choose card index (-1 to cancel)");
-                int cardIndex = getInput(-1, user.hand.getLastIndex());
+                int cardIndex = SystemManager.scanIntRange(-1, player.hand.getLastIndex());
                 if(cardIndex == -1) {
                     /* Play card canceled, return back to action selection */
                     continue;
                 }
                 /* User chose a valid card to play, play the card and end the turn. */
-                playCard(user.hand.remove(cardIndex), user.board);
+                playCard(player.hand.remove(cardIndex), player.board);
                 return false;
             }
         }
@@ -256,21 +208,19 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("0: Disable colors  1: Enable colors");
-        colorEnabled = getInput(0, 1) == 1;
+        SystemManager.setColorEnabled(SystemManager.scanIntRange(0, 1) == 1);
 
-        Player.setColorEnabled(colorEnabled);
-        Deck.setColorEnabled(colorEnabled);
+        SystemManager.println("   WELCOME TO BLUEJACK", SystemManager.ANSI_BLUE_BOLD);
 
-        printColor("   WELCOME TO BLUEJACK", "\033[1;94m");
-
-        Scanner nameScanner = new Scanner(System.in);
         System.out.print("Enter player name\n> ");
-        user.name = nameScanner.next().trim();
+        user.name = SystemManager.scanString();
 
         System.out.println("Dealing hands...");
 
         initGame();
         int set = 1;
+
+        user.board.add(new Card(20,0));
 
         /* The main game loop */
         while (user.getSet() < 3 && cpu.getSet() < 3) {
@@ -285,14 +235,14 @@ public class Main {
             do {
                 /* Player turn */
                 if (!playerStand) {
-                    playerStand = playerAction();
+                    playerStand = playerAction(user);
                     if (checkPlayer(user, cpu))
                         break;
                 }
 
                 /* Computer turn */
                 if (!computerStand) {
-                    computerStand = computerAction();
+                    computerStand = playerAction(cpu);
                     if (checkPlayer(cpu, user))
                         break;
                 }
