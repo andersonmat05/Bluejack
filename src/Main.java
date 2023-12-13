@@ -6,6 +6,13 @@ public class Main {
 
     public static boolean colorEnabled = false;
 
+    public static final String ANSI_POSITIVE_BACKGROUND = "\033[42m";
+    public static final String ANSI_NEGATIVE_BACKGROUND = "\033[41m";
+    public static final String ANSI_WHITE_BOLD = "\033[1;97m";
+
+    public static final String PLAYER_SET = "  Player wins the set  ";
+    public static final String CPU_SET = "  CPU wins the set  ";
+
     public static final int BOARD_SIZE = 9;
 
     public static Deck gameDeck = new Deck();
@@ -18,6 +25,16 @@ public class Main {
     public static Deck computerHand = new Deck();
     public static Deck computerBoard = new Deck();
 
+    private static void printColor(String string, String code) {
+        if (colorEnabled)
+            System.out.print(code);
+        System.out.print(string);
+        /* Reset color */
+        if (colorEnabled)
+            System.out.print("\u001B[0m");
+        System.out.println();
+    }
+
     /**
      * Prompts user to enter an integer within a range.
      * @param min Minimum value expected from user to enter, inclusive.
@@ -25,17 +42,20 @@ public class Main {
      */
     private static int getInput(int min, int max) {
         Scanner scan = new Scanner(System.in);
+        /* Keep user in the loop until valid input is entered */
         while (true) {
             try {
                 System.out.print("> ");
                 int input = scan.nextInt();
+                /* Check for range */
                 if (input >= min && input <= max) {
                     return input;
                 }
             } catch (java.util.InputMismatchException e) {
+                /* Consume the input */
                 scan.next();
             }
-            System.out.print("  invalid input, please enter again.\n");
+            System.out.print("  Invalid input, please enter again.\n");
         }
     }
 
@@ -181,22 +201,27 @@ public class Main {
         return false;
     }
 
+    /**
+     * Handles the special conditions and adds the card to the board.
+     * @param card The card to be played.
+     * @param board The board to place the card.
+     */
     public static void playCard(Card card, Deck board) {
-        if (card.isFlip()) {
+        if(card == null) return;
+        if (card.isFlip())
             board.set(new Card(board.get(board.getLastIndex()).value * -1,
-                    board.get(board.getLastIndex()).type), board.getLastIndex());
-        } else if (card.isDouble()) {
+                board.get(board.getLastIndex()).type), board.getLastIndex());
+        else if (card.isDouble())
             board.set(new Card(board.get(board.getLastIndex()).value * 2,
-                    board.get(board.getLastIndex()).type), board.getLastIndex());
-        } else {
-            board.add(card);
-        }
+                board.get(board.getLastIndex()).type), board.getLastIndex());
+        else board.add(card);
     }
 
     /**
      * Returns true if sum of values is 20 and all cards are blue
      */
     public static boolean checkBluejack(Deck board) {
+        if(board == null) return false;
         if(board.sumValues() != 20) {
             return false;
         }
@@ -213,11 +238,7 @@ public class Main {
         System.out.println("0: Disable colors  1: Enable colors");
         colorEnabled = getInput(0, 1) == 1;
 
-        if (colorEnabled)
-            System.out.print("\033[1;94m");
-        System.out.println("   WELCOME TO BLUEJACK");
-        if (colorEnabled)
-            System.out.print("\u001B[0m");
+        printColor("   WELCOME TO BLUEJACK", "\033[1;94m");
 
         Scanner nameScanner = new Scanner(System.in);
         System.out.print("Enter player name\n> ");
@@ -238,6 +259,7 @@ public class Main {
             computerBoard.clear();
             boolean playerStand = false;
             boolean computerStand = false;
+
             /* Game loop for a set */
             do {
                 /* Player turn */
@@ -246,11 +268,13 @@ public class Main {
                     if (playerBoard.sumValues() > 20) {
                         computerSet++;
                         System.out.println("Player busted!");
+                        printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
                         break;
                     }
                     if (checkBluejack(playerBoard)) {
                         playerSet = 3;
                         System.out.println("Bluejack!");
+                        printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
                         break;
                     }
                     /* Player sum is obviously less or equal to 20 if they
@@ -267,11 +291,13 @@ public class Main {
                     if (computerBoard.sumValues() > 20) {
                         playerSet++;
                         System.out.println("CPU busted!");
+                        printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
                         break;
                     }
                     if (checkBluejack(computerBoard)) {
                         computerSet = 3;
                         System.out.println("Bluejack!");
+                        printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
                         break;
                     }
                     if (computerBoard.getLastIndex()+1 == BOARD_SIZE) {
@@ -280,31 +306,21 @@ public class Main {
                     }
                 }
             } while (!(playerStand && computerStand));
-
             /* Set ended */
 
+            /* Check boards if the set ended with both players standing */
             if(playerStand && computerStand) {
                 System.out.println(20 - playerBoard.sumValues());
                 System.out.println(20 - computerBoard.sumValues());
+                System.out.print("   ");
                 if (playerBoard.sumValues() == computerBoard.sumValues()) {
                     System.out.println("Tie");
                 } else if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
                     playerSet++;
-                    System.out.print("   ");
-                    if (colorEnabled)
-                        System.out.print("\033[1;90m" + "\033[42m");
-                    System.out.print("   Player wins the set");
-                    if (colorEnabled)
-                        System.out.println("\u001B[0m");
+                    printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
                 } else {
                     computerSet++;
-                    System.out.print("   ");
-                    if (colorEnabled)
-                        System.out.print("\033[1;90m" + "\033[41m");
-                    System.out.print("CPU wins the set");
-                    if (colorEnabled) {
-                        System.out.println("\u001B[0m");
-                    }
+                    printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
                 }
             }
 
@@ -315,11 +331,10 @@ public class Main {
         }
 
         if (playerSet == 3) {
-            System.out.println("PLAYER WINS");
+            printColor("PLAYER WINS THE GAME", ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
         } else {
-            System.out.println("CPU WINS");
+            printColor("CPU WINS THE GAME", ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
         }
-
         /* Game ended */
     }
 }

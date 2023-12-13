@@ -43,12 +43,6 @@ public class Deck {
         return cards.length-1;
     }
 
-    // For testing purposes
-    @Deprecated
-    public Card[] getArray() {
-        return cards;
-    }
-
     /**
      * Append a new card to the end of the deck.
      */

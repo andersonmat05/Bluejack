@@ -35,19 +35,19 @@ public class Card {
 
     /**
      *  Returns a card with random signed value and color or a special card.
-     * @param special 0: No special cards, 1: Flip card, 2: Double card
+     * @param type 0: No special cards, 1: Flip card, 2: Double card
      */
-    public static Card randomSignedCard(int special) {
+    public static Card randomSignedCard(int type) {
         Random rand = new Random();
 
         /* %20 percent chance for a special card is checked using
         * nextFloat method that returns a value between 0-1 */
-        if (special != 0 && rand.nextFloat() < 0.2f) {
+        if (type != 0 && rand.nextFloat() < 0.2f) {
             /* Color types end at 3, any value greater than that means
             * special card. In this implementation there is no need for
             * checking what special card we return, therefore adding cards
             * just require to update the playCard method in Main class. */
-            return new Card(0, special+3);
+            return new Card(0, type+3);
         } else {
             int value = rand.nextInt(6) + 1;
             int color = rand.nextInt(4);
