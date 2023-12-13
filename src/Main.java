@@ -1,4 +1,3 @@
-import java.util.Random;
 import java.util.Scanner;
 
 
@@ -6,9 +5,8 @@ public class Main {
 
     public static boolean colorEnabled = false;
 
-    public static final String ANSI_POSITIVE_BACKGROUND = "\033[42m";
-    public static final String ANSI_NEGATIVE_BACKGROUND = "\033[41m";
-    public static final String ANSI_WHITE_BOLD = "\033[1;97m";
+    public static final String ANSI_POSITIVE = "\033[42m";
+    public static final String ANSI_NEGATIVE = "\033[41m";
 
     public static final String PLAYER_SET = "  Player wins the set  ";
     public static final String CPU_SET = "  CPU wins the set  ";
@@ -17,13 +15,9 @@ public class Main {
 
     public static Deck gameDeck = new Deck();
 
-    public static Deck playerDeck = new Deck();
-    public static Deck playerHand = new Deck();
-    public static Deck playerBoard = new Deck();
+    public static Player user = new Player("Player");
 
-    public static Deck computerDeck = new Deck();
-    public static Deck computerHand = new Deck();
-    public static Deck computerBoard = new Deck();
+    public static Player cpu = new Player("CPU");
 
     private static void printColor(String string, String code) {
         if (colorEnabled)
@@ -66,9 +60,9 @@ public class Main {
     public static void displayGame(boolean showComputerHand) {
         System.out.print("\nCPU Hand         : ");
         if (showComputerHand) {
-            computerHand.print(colorEnabled);
+            cpu.hand.print(colorEnabled);
         } else {
-            for (int i = 0; i <= computerHand.getLastIndex(); i++) {
+            for (int i = 0; i <= cpu.hand.getLastIndex(); i++) {
                 if (colorEnabled) {
                     System.out.print("[??]");
                 } else {
@@ -76,12 +70,12 @@ public class Main {
                 }
             }
         }
-        System.out.print("\nCPU Board    (" + String.format("%02d", computerBoard.sumValues()) + "): ");
-        computerBoard.print(colorEnabled);
-        System.out.print("\nPlayer Board (" + String.format("%02d", playerBoard.sumValues()) + "): ");
-        playerBoard.print(colorEnabled);
+        System.out.print("\nCPU Board    (" + String.format("%02d", cpu.board.sumValues()) + "): ");
+        cpu.board.print(colorEnabled);
+        System.out.print("\nPlayer Board (" + String.format("%02d", user.board.sumValues()) + "): ");
+        user.board.print(colorEnabled);
         System.out.print("\nPlayer Hand      : ");
-        playerHand.print(colorEnabled);
+        user.hand.print(colorEnabled);
     }
 
 
@@ -89,6 +83,10 @@ public class Main {
      * Set up game and player decks.
      */
     public static void initGame() {
+
+        user.color = ANSI_POSITIVE;
+        cpu.color = ANSI_NEGATIVE;
+
         /* Create the game deck and shuffle */
         for (int color = 0; color <= 3; color++) {
             for (int value = 1; value <= 10; value++) {
@@ -99,35 +97,35 @@ public class Main {
 
         /* Give players cards from top and bottom of game deck */
         for (int i = 0; i < 5; i++) {
-            playerDeck.add(gameDeck.remove(0));
-            computerDeck.add(gameDeck.remove(gameDeck.getLastIndex()));
+            user.deck.add(gameDeck.remove(0));
+            cpu.deck.add(gameDeck.remove(gameDeck.getLastIndex()));
         }
 
         /* First 3 random cards without spacial probability */
         for (int i = 0; i < 3; i++) {
-            playerDeck.add(Card.randomSignedCard(0));
-            computerDeck.add(Card.randomSignedCard(0));
+            user.deck.add(Card.randomSignedCard(0));
+            cpu.deck.add(Card.randomSignedCard(0));
         }
 
         /* Last 2 cards with special probability */
         for (int i = 1; i <= 2; i++) {
-            playerDeck.add(Card.randomSignedCard(i));
-            computerDeck.add(Card.randomSignedCard(i));
+            user.deck.add(Card.randomSignedCard(i));
+            cpu.deck.add(Card.randomSignedCard(i));
         }
 
         /* Shuffle the decks so the cards drawn are random */
-        playerDeck.shuffle();
-        computerDeck.shuffle();
+        user.deck.shuffle();
+        cpu.deck.shuffle();
 
         /* Draw the first 4 cards from each players deck to be their hand */
         for (int i = 0; i < 4; i++) {
-            playerHand.add(playerDeck.remove(i));
-            computerHand.add(computerDeck.remove(i));
+            user.hand.add(user.deck.remove(i));
+            cpu.hand.add(cpu.deck.remove(i));
         }
 
         /* Make sure there is nothing on the board */
-        playerBoard.clear();
-        computerBoard.clear();
+        user.board.clear();
+        cpu.board.clear();
     }
 
 
@@ -136,7 +134,7 @@ public class Main {
      */
     public static boolean playerAction() {
         /* Draw the top card from the game deck and place it on player board */
-        playerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
+        user.board.add(gameDeck.remove(gameDeck.getLastIndex()));
 
         /* Display the game so player can act accordingly. */
         displayGame(false);
@@ -148,7 +146,7 @@ public class Main {
             /* Prompt the player to choose an action. If they don't have
             * any cards in their hand, do not show the play card option */
             int action;
-            if (playerHand.getLastIndex() == -1) {
+            if (user.hand.getLastIndex() == -1) {
                 System.out.println("Choose action\n0: End  1: Stand");
                 action = getInput(0, 1);
             } else {
@@ -166,13 +164,13 @@ public class Main {
             } else if (action == 2) {
                 /* Prompt user to choose a card index */
                 System.out.println("Choose card index (-1 to cancel)");
-                int cardIndex = getInput(-1, playerHand.getLastIndex());
+                int cardIndex = getInput(-1, user.hand.getLastIndex());
                 if(cardIndex == -1) {
                     /* Play card canceled, return back to action selection */
                     continue;
                 }
                 /* User chose a valid card to play, play the card and end the turn. */
-                playCard(playerHand.remove(cardIndex), playerBoard);
+                playCard(user.hand.remove(cardIndex), user.board);
                 return false;
             }
         }
@@ -182,8 +180,9 @@ public class Main {
      * Computer actions and logic. Returns true if computer chose to stand.
      */
     public static boolean computerAction() {
-        computerBoard.add(gameDeck.remove(gameDeck.getLastIndex()));
+        cpu.board.add(gameDeck.remove(gameDeck.getLastIndex()));
         //todo: add actual logic
+        /*
         Random rand = new Random();
         if(rand.nextFloat() < 0.1f) {
             System.out.println("computer stands");
@@ -197,7 +196,8 @@ public class Main {
                 playCard(computerHand.remove(0), computerBoard);
             }
         }
-        System.out.println("computer ends the turn");
+         */
+        System.out.println("CPU ends the turn");
         return false;
     }
 
@@ -215,6 +215,26 @@ public class Main {
             board.set(new Card(board.get(board.getLastIndex()).value * 2,
                 board.get(board.getLastIndex()).type), board.getLastIndex());
         else board.add(card);
+    }
+
+    public static boolean checkPlayer(Player player, Player opponent) {
+        if (player.board.sumValues() > 20) {
+            System.out.println("Player busted!");
+            opponent.winSet();
+            return true;
+        }
+        if (checkBluejack(player.board)) {
+            System.out.println("Bluejack!");
+            player.winGame();
+            return true;
+        }
+        /* Player sum is obviously less or equal to 20 if they
+         * did not get caught by the statements above */
+        if (player.board.getLastIndex()+1 == BOARD_SIZE) {
+            player.winSet();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -238,25 +258,26 @@ public class Main {
         System.out.println("0: Disable colors  1: Enable colors");
         colorEnabled = getInput(0, 1) == 1;
 
+        Player.setColorEnabled(colorEnabled);
+        Deck.setColorEnabled(colorEnabled);
+
         printColor("   WELCOME TO BLUEJACK", "\033[1;94m");
 
         Scanner nameScanner = new Scanner(System.in);
         System.out.print("Enter player name\n> ");
-        String playerName = nameScanner.next().trim();
+        user.name = nameScanner.next().trim();
 
         System.out.println("Dealing hands...");
 
         initGame();
-        int playerSet = 0;
-        int computerSet = 0;
-        int setNum = 1;
+        int set = 1;
 
         /* The main game loop */
-        while (playerSet < 3 && computerSet < 3) {
-            System.out.println("\n ==== SET " + setNum + " ==== ");
+        while (user.getSet() < 3 && cpu.getSet() < 3) {
+            System.out.println("\n ==== SET " + set + " ==== ");
 
-            playerBoard.clear();
-            computerBoard.clear();
+            user.board.clear();
+            cpu.board.clear();
             boolean playerStand = false;
             boolean computerStand = false;
 
@@ -265,75 +286,43 @@ public class Main {
                 /* Player turn */
                 if (!playerStand) {
                     playerStand = playerAction();
-                    if (playerBoard.sumValues() > 20) {
-                        computerSet++;
-                        System.out.println("Player busted!");
-                        printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
+                    if (checkPlayer(user, cpu))
                         break;
-                    }
-                    if (checkBluejack(playerBoard)) {
-                        playerSet = 3;
-                        System.out.println("Bluejack!");
-                        printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
-                        break;
-                    }
-                    /* Player sum is obviously less or equal to 20 if they
-                    * did not get caught in the statement above */
-                    if (playerBoard.getLastIndex()+1 == BOARD_SIZE) {
-                        playerSet++;
-                        break;
-                    }
                 }
 
                 /* Computer turn */
                 if (!computerStand) {
                     computerStand = computerAction();
-                    if (computerBoard.sumValues() > 20) {
-                        playerSet++;
-                        System.out.println("CPU busted!");
-                        printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
+                    if (checkPlayer(cpu, user))
                         break;
-                    }
-                    if (checkBluejack(computerBoard)) {
-                        computerSet = 3;
-                        System.out.println("Bluejack!");
-                        printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
-                        break;
-                    }
-                    if (computerBoard.getLastIndex()+1 == BOARD_SIZE) {
-                        computerSet++;
-                        break;
-                    }
                 }
             } while (!(playerStand && computerStand));
             /* Set ended */
 
             /* Check boards if the set ended with both players standing */
             if(playerStand && computerStand) {
-                System.out.println(20 - playerBoard.sumValues());
-                System.out.println(20 - computerBoard.sumValues());
+                System.out.println(20 - user.board.sumValues());
+                System.out.println(20 - cpu.board.sumValues());
                 System.out.print("   ");
-                if (playerBoard.sumValues() == computerBoard.sumValues()) {
+                if (user.board.sumValues() == cpu.board.sumValues()) {
                     System.out.println("Tie");
-                } else if (20 - playerBoard.sumValues() < 20 - computerBoard.sumValues()) {
-                    playerSet++;
-                    printColor(PLAYER_SET, ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
+                } else if (20 - user.board.sumValues() < 20 - cpu.board.sumValues()) {
+                    user.winSet();
                 } else {
-                    computerSet++;
-                    printColor(CPU_SET, ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
+                    cpu.winSet();
                 }
             }
 
             displayGame(true);
             System.out.println();
-            System.out.println(playerSet + "-" + computerSet);
-            setNum++;
+            System.out.println(user.getSet() + "-" + cpu.getSet());
+            set++;
         }
 
-        if (playerSet == 3) {
-            printColor("PLAYER WINS THE GAME", ANSI_WHITE_BOLD + ANSI_POSITIVE_BACKGROUND);
+        if (user.getSet() == 3) {
+            user.winGame();
         } else {
-            printColor("CPU WINS THE GAME", ANSI_WHITE_BOLD + ANSI_NEGATIVE_BACKGROUND);
+            cpu.winGame();
         }
         /* Game ended */
     }

@@ -11,6 +11,12 @@ public class Deck {
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_BLUE = "\u001B[34m";
 
+    private static boolean colorEnabled;
+
+    public static void setColorEnabled(boolean newEnabled) {
+        colorEnabled = newEnabled;
+    }
+
     /**
      * Generates empty deck.
      */
