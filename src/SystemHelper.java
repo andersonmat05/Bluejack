@@ -1,13 +1,9 @@
 import java.util.Scanner;
 
-public class SystemManager {
+public class SystemHelper {
 
     /* Escape codes used in print method. */
     public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_WHITE_BOLD = "\033[1;97m";
     public static final String ANSI_POSITIVE_BG = "\033[42m";
     public static final String ANSI_NEGATIVE_BG = "\033[41m";

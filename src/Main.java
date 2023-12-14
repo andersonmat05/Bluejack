@@ -1,12 +1,10 @@
 public class Main {
 
-    public static final int BOARD_SIZE = 9;
-
     public static Deck gameDeck = new Deck();
 
-    public static Player user = new Player("Player", SystemManager.ANSI_POSITIVE_BG);
+    public static Player user = new Player("Player", SystemHelper.ANSI_POSITIVE_BG);
 
-    public static Player cpu = new Player("CPU", SystemManager.ANSI_NEGATIVE_BG);
+    public static Player cpu = new Player("CPU", SystemHelper.ANSI_NEGATIVE_BG);
 
     /**
      * Print out boards and hands of both the computer and player.
@@ -19,7 +17,7 @@ public class Main {
             cpu.hand.print();
         } else {
             for (int i = 0; i <= cpu.hand.getLastIndex(); i++) {
-                if (SystemManager.colorEnabled) {
+                if (SystemHelper.colorEnabled) {
                     System.out.print("[??]");
                 } else {
                     System.out.print("[???]");
@@ -85,6 +83,7 @@ public class Main {
      * Player actions. Returns true if player chose to stand.
      */
     public static boolean playerAction(Player player) {
+
         /* Draw the top card from the game deck and place it on player board */
         player.board.add(gameDeck.remove(gameDeck.getLastIndex()));
 
@@ -100,10 +99,10 @@ public class Main {
             int action;
             if (player.hand.getLastIndex() == -1) {
                 System.out.println("Choose action\n0: End  1: Stand");
-                action = SystemManager.scanIntRange(0, 1);
+                action = SystemHelper.scanIntRange(0, 1);
             } else {
                 System.out.println("Choose action\n0: End  1: Stand  2: Play Card");
-                action = SystemManager.scanIntRange(0, 2);
+                action = SystemHelper.scanIntRange(0, 2);
             }
 
             if (action == 0) {
@@ -116,13 +115,13 @@ public class Main {
             } else if (action == 2) {
                 /* Prompt user to choose a card index */
                 System.out.println("Choose card index (-1 to cancel)");
-                int cardIndex = SystemManager.scanIntRange(-1, player.hand.getLastIndex());
+                int cardIndex = SystemHelper.scanIntRange(-1, player.hand.getLastIndex());
                 if(cardIndex == -1) {
                     /* Play card canceled, return back to action selection */
                     continue;
                 }
                 /* User chose a valid card to play, play the card and end the turn. */
-                playCard(player.hand.remove(cardIndex), player.board);
+                player.playCard(cardIndex);
                 return false;
             }
         }
@@ -153,74 +152,21 @@ public class Main {
         return false;
     }
 
-    /**
-     * Handles the special conditions and adds the card to the board.
-     * @param card The card to be played.
-     * @param board The board to place the card.
-     */
-    public static void playCard(Card card, Deck board) {
-        if(card == null) return;
-        if (card.isFlip())
-            board.set(new Card(board.get(board.getLastIndex()).value * -1,
-                board.get(board.getLastIndex()).type), board.getLastIndex());
-        else if (card.isDouble())
-            board.set(new Card(board.get(board.getLastIndex()).value * 2,
-                board.get(board.getLastIndex()).type), board.getLastIndex());
-        else board.add(card);
-    }
-
-    public static boolean checkPlayer(Player player, Player opponent) {
-        if (player.board.sumValues() > 20) {
-            System.out.println("Player busted!");
-            opponent.winSet();
-            return true;
-        }
-        if (checkBluejack(player.board)) {
-            System.out.println("Bluejack!");
-            player.winGame();
-            return true;
-        }
-        /* Player sum is obviously less or equal to 20 if they
-         * did not get caught by the statements above */
-        if (player.board.getLastIndex()+1 == BOARD_SIZE) {
-            player.winSet();
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if sum of values is 20 and all cards are blue
-     */
-    public static boolean checkBluejack(Deck board) {
-        if(board == null) return false;
-        if(board.sumValues() != 20) {
-            return false;
-        }
-        boolean isAllBlue = true;
-        for (int i = 0; i < board.getLastIndex() + 1; i++) {
-            if (board.get(i).type != 0)
-                isAllBlue = false;
-        }
-        return isAllBlue;
-    }
 
     public static void main(String[] args) {
 
         System.out.println("0: Disable colors  1: Enable colors");
-        SystemManager.setColorEnabled(SystemManager.scanIntRange(0, 1) == 1);
+        SystemHelper.setColorEnabled(SystemHelper.scanIntRange(0, 1) == 1);
 
-        SystemManager.println("   WELCOME TO BLUEJACK", SystemManager.ANSI_BLUE_BOLD);
+        SystemHelper.println("   WELCOME TO BLUEJACK", SystemHelper.ANSI_BLUE_BOLD);
 
         System.out.print("Enter player name\n> ");
-        user.name = SystemManager.scanString();
+        user.name = SystemHelper.scanString();
 
         System.out.println("Dealing hands...");
 
         initGame();
         int set = 1;
-
-        user.board.add(new Card(20,0));
 
         /* The main game loop */
         while (user.getSet() < 3 && cpu.getSet() < 3) {
@@ -228,6 +174,7 @@ public class Main {
 
             user.board.clear();
             cpu.board.clear();
+
             boolean playerStand = false;
             boolean computerStand = false;
 
@@ -236,14 +183,14 @@ public class Main {
                 /* Player turn */
                 if (!playerStand) {
                     playerStand = playerAction(user);
-                    if (checkPlayer(user, cpu))
+                    if (user.checkBoard(cpu))
                         break;
                 }
 
                 /* Computer turn */
                 if (!computerStand) {
                     computerStand = playerAction(cpu);
-                    if (checkPlayer(cpu, user))
+                    if (cpu.checkBoard(user))
                         break;
                 }
             } while (!(playerStand && computerStand));
