@@ -87,13 +87,10 @@ public class Deck {
      */
     public void shuffle() {
         Random rand = new Random();
-
         /* Iterate through the array starting from the last element */
         for (int i = cards.length-1; i > 0; i--) {
-
             /* Pick a random index from 0 to i */
             int j = rand.nextInt(i+1);
-
             /* Swap element at i with random index */
             Card temp = cards[i];
             cards[i] = cards[j];
@@ -118,78 +115,30 @@ public class Deck {
     public void print() {
 
         /* End the method here if no cards are present */
-        if(cards.length == 0) {
+        if (cards.length == 0) {
             System.out.print("Empty");
             return;
         }
 
-        for(Card card : cards)
-        {
-            if (SystemManager.colorEnabled) {
-                switch (card.type) {
-                    case 0:
-                        // Blue
-                        System.out.print(SystemManager.ANSI_BLUE);
-                        break;
-                    case 1:
-                        // Yellow
-                        System.out.print(SystemManager.ANSI_YELLOW);
-                        break;
-                    case 2:
-                        // Red
-                        System.out.print(SystemManager.ANSI_RED);
-                        break;
-                    case 3:
-                        // Green
-                        System.out.print(SystemManager.ANSI_GREEN);
-                        break;
-                    default:
-                        // Special
-                        System.out.print(SystemManager.ANSI_RESET);
-                        break;
-                }
-            }
+        for (Card card : cards) {
+            /* Print the color */
+            System.out.print(card.getColor());
+            System.out.print("[");
+            /* Symbols for special cards */
             if (card.isFlip()) {
-                if (SystemManager.colorEnabled) {
-                    System.out.print("[+-]");
-                } else {
-                    System.out.print("[+- ]");
-                }
+                System.out.print("+-");
             } else if (card.isDouble()) {
-                if (SystemManager.colorEnabled) {
-                    System.out.print("[x2]");
-                } else {
-                    System.out.print("[2x ]");
-                }
+                System.out.print("x2");
             } else {
-                System.out.print("[" + String.format("%02d", card.value));
-                if (!SystemManager.colorEnabled) {
-                    switch (card.type) {
-                        case 0:
-                            // Blue
-                            System.out.print("B");
-                            break;
-                        case 1:
-                            // Yellow
-                            System.out.print("Y");
-                            break;
-                        case 2:
-                            // Red
-                            System.out.print("R");
-                            break;
-                        case 3:
-                            // Green
-                            System.out.print("G");
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                System.out.print("]");
+                System.out.printf("%02d", card.value);
             }
-        }
-        if (SystemManager.colorEnabled) {
-            System.out.print(SystemManager.ANSI_RESET);
+            /* Print letter */
+            System.out.print(card.getLetter());
+            System.out.print("]");
+            /* Clean the color */
+            if (SystemHelper.colorEnabled) {
+                System.out.print(SystemHelper.ANSI_RESET);
+            }
         }
     }
 }

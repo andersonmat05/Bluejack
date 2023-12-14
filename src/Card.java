@@ -3,12 +3,21 @@ import java.util.Random;
 
 public class Card {
 
-    /* Actual value of the card, used for both signed and regular cards.
-    * 0 for special cards. */
+    /* ANSI color codes for colored cards */
+    private static final String[] CARD_COLORS = {"\u001B[34m", "\u001B[33m", "\u001B[31m", "\u001B[32m"};
+    /* Letter representation of colors */
+    private static final String[] CARD_LETTERS = {"B", "Y", "R", "G"};
+
+    /**
+     * Actual value of the card, used for both signed and regular cards.
+     * 0 for special cards.
+     */
     public int value;
 
-    /* Used for storing both the color and special card type.
-    * 0: Blue, 1: Yellow, 2: Red, 3: Green, 4 Flip, 5, Double */
+    /**
+     * Used for storing both the color and special card type.
+     * 0: Blue, 1: Yellow, 2: Red, 3: Green, 4 Flip, 5, Double
+     */
     public int type;
 
     /**
@@ -17,6 +26,28 @@ public class Card {
     public Card(int value, int type) {
         this.value = value;
         this.type = type;
+    }
+
+    /**
+     * Color code for this card. Returns blank if colors are disabled.
+     */
+    public String getColor() {
+        if(SystemHelper.colorEnabled && type < 4) {
+            return CARD_COLORS[type];
+        }
+        return "";
+    }
+
+    /**
+     * Returns letter representation of this card's color. Returns blank if colors are enabled.
+     */
+    public String getLetter() {
+        if(!SystemHelper.colorEnabled) {
+            if (type < 4)
+                return CARD_LETTERS[type];
+            else return " ";
+        }
+        return "";
     }
 
     /**
