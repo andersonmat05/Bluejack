@@ -31,8 +31,8 @@ public class Card {
     /**
      * Color code for this card. Returns blank if colors are disabled.
      */
-    public String getColor() {
-        if(SystemHelper.colorEnabled && type < 4) {
+    public String getDisplayColor() {
+        if(SystemHelper.getColorEnabled() && type < 4) {
             return CARD_COLORS[type];
         }
         return "";
@@ -41,8 +41,8 @@ public class Card {
     /**
      * Returns letter representation of this card's color. Returns blank if colors are enabled.
      */
-    public String getLetter() {
-        if(!SystemHelper.colorEnabled) {
+    public String getDisplayLetter() {
+        if(!SystemHelper.getColorEnabled()) {
             if (type < 4)
                 return CARD_LETTERS[type];
             else return " ";

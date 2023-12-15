@@ -11,16 +11,15 @@ public class Main {
      * @param showComputerHand Whether to hide or show computer hand.
      */
     public static void displayGame(boolean showComputerHand) {
-        //todo: change to player names & auto align spaces
         System.out.print("\nCPU Hand         : ");
         if (showComputerHand) {
             cpu.hand.print();
         } else {
             for (int i = 0; i <= cpu.hand.getLastIndex(); i++) {
-                if (SystemHelper.colorEnabled) {
+                if (SystemHelper.getColorEnabled()) {
                     System.out.print("[??]");
                 } else {
-                    System.out.print("[???]");
+                    System.out.print("[ ? ]");
                 }
             }
         }
@@ -198,11 +197,9 @@ public class Main {
 
             /* Check boards if the set ended with both players standing */
             if(playerStand && computerStand) {
-                System.out.println(20 - user.board.sumValues());
-                System.out.println(20 - cpu.board.sumValues());
                 System.out.print("   ");
                 if (user.board.sumValues() == cpu.board.sumValues()) {
-                    System.out.println("Tie");
+                    System.out.println("\n   Tie");
                 } else if (20 - user.board.sumValues() < 20 - cpu.board.sumValues()) {
                     user.winSet();
                 } else {

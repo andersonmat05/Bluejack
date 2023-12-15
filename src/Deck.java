@@ -122,7 +122,7 @@ public class Deck {
 
         for (Card card : cards) {
             /* Print the color */
-            System.out.print(card.getColor());
+            System.out.print(card.getDisplayColor());
             System.out.print("[");
             /* Symbols for special cards */
             if (card.isFlip()) {
@@ -133,10 +133,10 @@ public class Deck {
                 System.out.printf("%02d", card.value);
             }
             /* Print letter */
-            System.out.print(card.getLetter());
+            System.out.print(card.getDisplayLetter());
             System.out.print("]");
             /* Clean the color */
-            if (SystemHelper.colorEnabled) {
+            if (SystemHelper.getColorEnabled()) {
                 System.out.print(SystemHelper.ANSI_RESET);
             }
         }

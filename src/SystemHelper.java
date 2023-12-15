@@ -9,10 +9,14 @@ public class SystemHelper {
     public static final String ANSI_NEGATIVE_BG = "\033[41m";
     public static final String ANSI_BLUE_BOLD = "\033[1;94m";
 
-    public static boolean colorEnabled;
+    private static boolean colorEnabled;
 
     public static void setColorEnabled(boolean newEnabled) {
         colorEnabled = newEnabled;
+    }
+
+    public static boolean getColorEnabled() {
+        return colorEnabled;
     }
 
     public static void print(String x, String color) {
