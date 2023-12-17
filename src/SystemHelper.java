@@ -8,6 +8,7 @@ public class SystemHelper {
     public static final String ANSI_POSITIVE_BG = "\033[42m";
     public static final String ANSI_NEGATIVE_BG = "\033[41m";
     public static final String ANSI_BLUE_BOLD = "\033[1;94m";
+    public static final String ANSI_GRAY_BG = "\033[0;100m";
 
     private static boolean colorEnabled;
 
@@ -39,26 +40,27 @@ public class SystemHelper {
      * @param max Maximum value expected from user to enter, inclusive.
      */
     public static int scanIntRange(int min, int max) {
-        Scanner scan = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         /* Keep user in the loop until valid input is entered */
         while (true) {
             try {
                 System.out.print("> ");
-                int input = scan.nextInt();
+                int input = scanner.nextInt();
                 /* Check for range */
                 if (input >= min && input <= max) {
                     return input;
                 }
             } catch (java.util.InputMismatchException e) {
                 /* Consume the input */
-                scan.next();
+                scanner.next();
             }
             System.out.print("  Invalid input, please enter again.\n");
         }
     }
 
     public static String scanString() {
-        Scanner scan = new Scanner(System.in);
-        return scan.next().trim();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("> ");
+        return scanner.next().trim();
     }
 }
