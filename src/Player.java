@@ -2,6 +2,7 @@ public class Player {
 
     public String name;
     private final String color;
+    private final boolean cpu;
 
     public Deck deck;
     public Deck board;
@@ -9,9 +10,12 @@ public class Player {
 
     private int set;
 
-    public Player(String name, String color) {
+
+    public Player(String name, String color, boolean cpu) {
         this.name = name;
         this.color = color;
+        this.cpu = cpu;
+
         this.deck = new Deck();
         this.board = new Deck();
         this.hand = new Deck();
@@ -88,10 +92,16 @@ public class Player {
         return isAllBlue;
     }
 
+    public boolean action() {
+        if(cpu)
+            return logicAction();
+        return inputAction();
+    }
+
     /**
      * Player actions. Returns true if player chose to stand.
      */
-    public boolean inputAction() {
+    private boolean inputAction() {
         /* Put the user in a loop until action completes */
         while (true) {
 
@@ -128,24 +138,8 @@ public class Player {
         }
     }
 
-    public boolean logicAction() {
+    private boolean logicAction() {
         //todo: add actual logic
-        /*
-        Random rand = new Random();
-        if(rand.nextFloat() < 0.1f) {
-            System.out.println("computer stands");
-            return true;
-        }
-        if(rand.nextFloat() < 0.3) {
-            System.out.println("computer plays a card");
-            if (computerHand.getLastIndex() > 0) {
-                playCard(computerHand.remove(rand.nextInt(computerHand.getLastIndex())), computerBoard);
-            } else if (computerHand.getLastIndex() == 0) {
-                playCard(computerHand.remove(0), computerBoard);
-            }
-        }
-         */
-        System.out.println("CPU ends the turn");
         return false;
     }
 }

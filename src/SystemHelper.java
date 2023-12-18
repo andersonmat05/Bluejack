@@ -58,6 +58,9 @@ public class SystemHelper {
         }
     }
 
+    /**
+     * Prompt user to enter a string.
+     */
     public static String scanString() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("> ");
