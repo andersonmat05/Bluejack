@@ -83,12 +83,14 @@ public class Game {
         boolean player2Stand = false;
         /* Game loop for a set */
         do {
-            Game.display(player1, player2, false);
-            System.out.println();
 
             /* Player 1 turn */
             if (!player1Stand) {
                 player1.board.add(deck.remove(deck.getLastIndex()));
+
+                Game.display(player1, player2, false);
+                System.out.println();
+
                 player1Stand = player1.action();
                 if (player1.checkBoard(player2))
                     return false;
