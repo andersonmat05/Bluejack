@@ -153,6 +153,22 @@ public class Player {
     }
 
     /**
+     * Returns the new sum if this card is played.
+     */
+    private int playResult(Card card) {
+        if (card.type == 4) {
+            return board.get(board.getLastIndex()).value * -1
+                    + board.sumValues() - board.get(board.getLastIndex()).value;
+        }
+        if (card.type == 5) {
+            return board.get(board.getLastIndex()).value * 2
+                    + board.sumValues() - board.get(board.getLastIndex()).value;
+        }
+        /* Return addition if not special card */
+        return board.sumValues() + card.value;
+    }
+
+    /**
      * CPU actions. Returns true if cpu decides to stand.
      */
     private boolean logicAction(Deck opponentBoard) {
@@ -160,7 +176,7 @@ public class Player {
         if (board.sumValues() == 20)
             return true;
 
-        /* Try to save if above 20 */
+        /* DEFENSIVE BEHAVIOUR */
         if (board.sumValues() > 20) {
             if (hand.getLastIndex() == -1)
                 return false;
@@ -168,20 +184,35 @@ public class Player {
             /* Select the best card to play */
             boolean playCard = false;
             int cardIndex = 0;
+            /* Iterate through all cards in hand */
             for (int i = 1; i <= hand.getLastIndex(); i++) {
-                int cardValue = hand.get(i).value;
-                if (cardValue <= 20 - hand.sumValues() &&
-                        cardValue < hand.get(cardIndex).value) {
-                    cardIndex = i;
-                    playCard = true;
+                Card card = hand.get(i);
+                if (card.value == 0) {
+                    /* Special card found */
+                    int currentSpecialResult = playResult(card);
+                    if (currentSpecialResult <= 20) {
+                        // Check if it is better than last card
+                        if (playResult(hand.get(cardIndex)) < currentSpecialResult || !playCard) {
+                            cardIndex = i;
+                            playCard = true;
+                        }
+                    }
+                } else {
+                    /* Not special card */
+                    if (playResult(card) <= 20 &&
+                            card.value < hand.get(cardIndex).value) {
+                        cardIndex = i;
+                        playCard = true;
+                    }
                 }
             }
             if(playCard) {
                 playCard(cardIndex);
-                return false;
             }
-            //todo: account for special cards
+            return false;
         }
+        /* OFFENSIVE BEHAVIOUR */
+        //todo: improve
         if (opponentBoard.sumValues() < board.sumValues()) {
             if(board.sumValues() > 15)
                 return true;

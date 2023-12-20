@@ -111,7 +111,7 @@ public class Game {
      */
     public static void playerTurn(Player player, Player opponent) {
         if (Game.deck.getLastIndex() == -1) {
-            System.out.println("No cards left in game deck");
+            System.out.println("No cards left in game deck.");
         } else {
             player.board.add(deck.remove(deck.getLastIndex()));
         }
@@ -120,6 +120,8 @@ public class Game {
             Game.display(player, opponent, false);
 
         player.stand = player.action(opponent.board);
+        if (player.stand)
+            System.out.println("  " + player.name + " stands.");
     }
 
     /**
@@ -132,6 +134,9 @@ public class Game {
             so they don't see each other's hand. */
             if(!(player1.isCpu() || player2.isCpu()))
                 SystemHelper.scanEnter();
+
+            if (Game.deck.getLastIndex() == -1)
+                return;
 
             /* Player 1 turn */
             if (!player1.stand) {
@@ -187,6 +192,10 @@ public class Game {
             player2.stand = false;
 
             setLoop();
+
+            // prevent infinite loop temp
+            if (Game.deck.getLastIndex() == -1)
+                return;
 
             /* Display the end result of the board after set ended */
             display(player1, player2, true);
