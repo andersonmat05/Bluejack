@@ -1,18 +1,34 @@
 public class Main {
     public static void main(String[] args) {
+        boolean useArgs = false;
+        int gameMode = 0;
 
-        /* Prompt the user to enable or disable colors */
+        if (args.length == 2) {
+            try {
+                SystemHelper.setColorEnabled(Integer.parseInt(args[0]) == 1);
+                gameMode = Integer.parseInt(args[1]);
+                if (gameMode > 2 || gameMode < 0) {
+                    System.out.println("Invalid arguments.");
+                }
+                useArgs = true;
+            } catch (Exception e) {
+                System.out.println("Invalid arguments.");
+            }
+        }
 
-        //System.out.println("0: Disable colors  1: Enable colors");
-        //SystemHelper.setColorEnabled(SystemHelper.scanIntRange(0, 1) == 1);
-        SystemHelper.setColorEnabled(true);
+        if (!useArgs) {
+            /* Prompt the user to enable or disable colors */
+            System.out.println("0: Disable colors  1: Enable colors");
+            SystemHelper.setColorEnabled(SystemHelper.scanIntRange(0, 1) == 1);
 
-        SystemHelper.println("\n   WELCOME TO BLUEJACK", SystemHelper.ANSI_BLUE_BOLD);
-        SystemHelper.println("      by Umut Göler\n", SystemHelper.ANSI_WHITE_BOLD);
+            SystemHelper.println("\n   WELCOME TO BLUEJACK", SystemHelper.ANSI_BLUE_BOLD);
+            SystemHelper.println("      by Umut Göler\n", SystemHelper.ANSI_WHITE_BOLD);
 
-        /* Prompt the user to select game mode */
-        System.out.println("0: Player VS CPU  1: Player VS Player  2: CPU VS CPU");
-        int gameMode = SystemHelper.scanIntRange(0,2);
+            /* Prompt the user to select game mode */
+            System.out.println("0: Player VS CPU  1: Player VS Player  2: CPU VS CPU");
+            gameMode = SystemHelper.scanIntRange(0, 2);
+        }
+
         switch (gameMode) {
             case 0:
                 Game.init(false, true);

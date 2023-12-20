@@ -4,6 +4,7 @@ public class Game {
     public static Player player1;
     public static Player player2;
     private static int set;
+    private static final int CLEAR_LENGHT = 32;
 
     /**
      * Set up game and player decks.
@@ -110,6 +111,16 @@ public class Game {
      * Handle player turn.
      */
     public static void playerTurn(Player player, Player opponent) {
+        /* If game is PvP, wait for players to switch,
+        so they don't see each other's hand. */
+        if(!(player.isCpu() || opponent.isCpu())) {
+            for (int i = 0; i < CLEAR_LENGHT; i++) {
+                System.out.println();
+            }
+            System.out.print(player.name + "'s turn\n");
+            SystemHelper.scanEnter();
+        }
+
         if (Game.deck.getLastIndex() != -1)
             player.board.add(deck.remove(deck.getLastIndex()));
 
@@ -131,10 +142,6 @@ public class Game {
             if (Game.deck.getLastIndex() == -1)
                 break;
 
-            /* If game is PvP, wait for players to switch,
-            so they don't see each other's hand. */
-            if(!(player1.isCpu() || player2.isCpu()))
-                SystemHelper.scanEnter();
 
             /* Player 1 turn */
             if (!player1.stand) {
@@ -146,9 +153,6 @@ public class Game {
 
             if (Game.deck.getLastIndex() == -1)
                 break;
-
-            if(!(player1.isCpu() || player2.isCpu()))
-                SystemHelper.scanEnter();
 
             /* Player 2 turn */
             if (!player2.stand) {
@@ -199,6 +203,9 @@ public class Game {
 
             SystemHelper.println("   " + player1.getSet() + " - " + player2.getSet(),
                     SystemHelper.ANSI_BLUE_BOLD);
+
+            if (!(player1.isCpu() || player2.isCpu()))
+                SystemHelper.scanEnter();
 
             /* Finish game if no cards remain in game deck */
             if (Game.deck.getLastIndex() == -1)
