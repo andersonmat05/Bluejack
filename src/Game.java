@@ -110,11 +110,8 @@ public class Game {
      * Handle player turn.
      */
     public static void playerTurn(Player player, Player opponent) {
-        if (Game.deck.getLastIndex() == -1) {
-            System.out.println("No cards left in game deck.");
-        } else {
+        if (Game.deck.getLastIndex() != -1)
             player.board.add(deck.remove(deck.getLastIndex()));
-        }
 
         if (!player.isCpu())
             Game.display(player, opponent, false);
@@ -130,13 +127,14 @@ public class Game {
     public static void setLoop() {
         /* Loop until both players stand */
         do {
+            /* Cancel set if no cards remain in game deck */
+            if (Game.deck.getLastIndex() == -1)
+                break;
+
             /* If game is PvP, wait for players to switch,
             so they don't see each other's hand. */
             if(!(player1.isCpu() || player2.isCpu()))
                 SystemHelper.scanEnter();
-
-            if (Game.deck.getLastIndex() == -1)
-                return;
 
             /* Player 1 turn */
             if (!player1.stand) {
@@ -145,6 +143,9 @@ public class Game {
                     /* End set */
                     return;
             }
+
+            if (Game.deck.getLastIndex() == -1)
+                break;
 
             if(!(player1.isCpu() || player2.isCpu()))
                 SystemHelper.scanEnter();
@@ -193,22 +194,27 @@ public class Game {
 
             setLoop();
 
-            // prevent infinite loop temp
-            if (Game.deck.getLastIndex() == -1)
-                return;
-
             /* Display the end result of the board after set ended */
             display(player1, player2, true);
 
             SystemHelper.println("   " + player1.getSet() + " - " + player2.getSet(),
                     SystemHelper.ANSI_BLUE_BOLD);
+
+            /* Finish game if no cards remain in game deck */
+            if (Game.deck.getLastIndex() == -1)
+                break;
         }
+        /* Game ended */
 
         /* Check who wins */
-        if (player1.getSet() == 3) {
+        if (player1.getSet() > player2.getSet()) {
             player1.winGame();
-        } else {
+        } else if (player2.getSet() > player1.getSet()) {
             player2.winGame();
+        } else {
+            /* Tie condition */
+            System.out.print("\n   ");
+            SystemHelper.println("   Tie   ", SystemHelper.ANSI_WHITE_BOLD + SystemHelper.ANSI_GRAY_BG);
         }
     }
 }
