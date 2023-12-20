@@ -178,6 +178,7 @@ public class Player {
 
         /* DEFENSIVE BEHAVIOUR */
         if (board.sumValues() > 20) {
+            // There is nothing we can do...
             if (hand.getLastIndex() == -1)
                 return false;
 
@@ -206,17 +207,61 @@ public class Player {
                     }
                 }
             }
+            /* Found a card to play */
             if(playCard) {
                 playCard(cardIndex);
             }
             return false;
         }
         /* OFFENSIVE BEHAVIOUR */
-        //todo: improve
         if (opponentBoard.sumValues() < board.sumValues()) {
-            if(board.sumValues() > 15)
+            /* Check if there is a risk of getting busted */
+            if(board.sumValues() > 14) {
+                /* Check cards at hand */
+                if (hand.getLastIndex() != -1) {
+                    /* Check if there is a flip card in hand */
+                    boolean haveFlip = false;
+                    for (int i = 0; i <= hand.getLastIndex(); i++) {
+                        if (hand.get(i).isFlip()) {
+                            haveFlip = true;
+                        }
+                    }
+                    if (haveFlip) {
+                        /* New card can be flipped, risk is low */
+                        return false;
+                    }
+
+                    // Check regular cards
+                    int minCard = hand.minIndex();
+                    if (minCard != -1) {
+                        if (hand.get(minCard).value < -3) {
+                            /* There is a strong negative, risk is low */
+                            return false;
+                        }
+                    }
+                }
+                /* Risk is too high */
                 return true;
+            }
         }
+        if (board.sumValues() < 10) {
+            /* Check if there is a double card in hand */
+            int doubleIndex = -1;
+            for (int i = 0; i <= hand.getLastIndex(); i++) {
+                if (hand.get(i).isDouble()) {
+                    doubleIndex = i;
+                }
+            }
+            if (doubleIndex != -1) {
+                /* Check the risk */
+                if (playResult(hand.get(doubleIndex)) < 15) {
+                    /* Safe to play double */
+                    playCard(doubleIndex);
+                    return false;
+                }
+            }
+        }
+        /* Too early to make a meaningful decision */
         return false;
     }
 }

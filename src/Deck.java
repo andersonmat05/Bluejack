@@ -110,6 +110,29 @@ public class Deck {
     }
 
     /**
+     * Finds the index of the card with minimum value.
+     * Returns -1 if there is no colored card in the deck.
+     */
+    public int minIndex() {
+        /* Check if there is any card */
+        if(getLastIndex() == -1)
+            return -1;
+
+        int min = 0;
+        /* We still need to check if there is any colored card. */
+        boolean found = false;
+        for (int i = 0; i <= getLastIndex(); i++) {
+            if (!(cards[i].value == 0) && cards[i].value < cards[min].value) {
+                found = true;
+                min = i;
+            }
+        }
+        if (!found)
+            min = -1;
+        return min;
+    }
+
+    /**
      * Prints out all the cards present in the deck.
      */
     public void print() {
