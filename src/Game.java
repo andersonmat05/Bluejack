@@ -11,7 +11,7 @@ public class Game {
     public static void init() {
         /* initialize static variables */
         deck = new Deck();
-        player1 = new Player("Player", SystemHelper.ANSI_POSITIVE_BG, false);
+        player1 = new Player("Player", SystemHelper.ANSI_POSITIVE_BG, true);
         player2 = new Player("CPU", SystemHelper.ANSI_NEGATIVE_BG, true);
         set = 0;
 
@@ -58,7 +58,7 @@ public class Game {
      */
     public static void display(Player player, Player opponent, boolean showOpponentHand) {
         //todo: print names
-        System.out.print("\nCPU Hand         : ");
+        System.out.print("\nOpponent Hand      : ");
         if (showOpponentHand) {
             opponent.hand.print();
         } else {
@@ -70,15 +70,16 @@ public class Game {
                 }
             }
         }
-        System.out.print("\nCPU Board    (" + String.format("%02d", opponent.board.sumValues()) + "): ");
+        System.out.print("\nOpponent Board (" + String.format("%02d", opponent.board.sumValues()) + "): ");
         opponent.board.print();
-        System.out.print("\nPlayer Board (" + String.format("%02d", player.board.sumValues()) + "): ");
+        System.out.print("\nYour Board     (" + String.format("%02d", player.board.sumValues()) + "): ");
         player.board.print();
-        System.out.print("\nPlayer Hand      : ");
+        System.out.print("\nYour Hand          : ");
         player.hand.print();
+        System.out.println();
     }
 
-    public static boolean setLoop() {
+    public static void setLoop() {
         boolean player1Stand = false;
         boolean player2Stand = false;
         /* Game loop for a set */
@@ -89,11 +90,11 @@ public class Game {
                 player1.board.add(deck.remove(deck.getLastIndex()));
 
                 Game.display(player1, player2, false);
-                System.out.println();
 
                 player1Stand = player1.action();
                 if (player1.checkBoard(player2))
-                    return false;
+                    /* Set ended */
+                    return;
             }
 
             /* Player 2 turn */
@@ -101,39 +102,39 @@ public class Game {
                 player2.board.add(deck.remove(deck.getLastIndex()));
                 player2Stand = player2.action();
                 if (player2.checkBoard(player1))
-                    return false;
+                    /* Set ended */
+                    return;
             }
         } while (!(player1Stand && player2Stand));
         /* Set ended with both players standing */
-        return true;
+
+        /* Check boards */
+        System.out.print("   ");
+        if (player1.board.sumValues() == player2.board.sumValues()) {
+            System.out.print("\n   ");
+            SystemHelper.println("   Tie   ", SystemHelper.ANSI_WHITE_BOLD + SystemHelper.ANSI_GRAY_BG);
+        } else if (20 - player1.board.sumValues() < 20 - player2.board.sumValues()) {
+            player1.winSet();
+        } else {
+            player2.winSet();
+        }
     }
 
     public static void gameLoop() {
         /* The main game loop */
         while (player1.getSet() < 3 && player2.getSet() < 3) {
-            System.out.println("\n   SET " + set+1 + "   ");
+            System.out.println("\n   SET " + ++set + "   ");
 
             /* Clean the board for the new set */
             player1.board.clear();
             player2.board.clear();
 
-            if(setLoop()) {
-                System.out.print("   ");
-                /* Check boards if the set ended with both players standing */
-                if (player1.board.sumValues() == player2.board.sumValues()) {
-                    System.out.print("\n   ");
-                    SystemHelper.println("   Tie   ", SystemHelper.ANSI_WHITE_BOLD + SystemHelper.ANSI_GRAY_BG);
-                } else if (20 - player1.board.sumValues() < 20 - player2.board.sumValues()) {
-                    player1.winSet();
-                } else {
-                    player2.winSet();
-                }
-            }
+            setLoop();
 
             display(player1, player2, true);
-            System.out.println();
+
+            //todo: make fancier
             System.out.println(player1.getSet() + "-" + player2.getSet());
-            set++;
         }
 
         if (player1.getSet() == 3) {
