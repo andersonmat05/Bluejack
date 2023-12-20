@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Scanner;
 
 public class SystemHelper {
@@ -21,6 +20,9 @@ public class SystemHelper {
         return colorEnabled;
     }
 
+    /**
+     * Prints a string in color.
+     */
     public static void print(String x, String color) {
         if (colorEnabled)
             System.out.print(color);
@@ -30,6 +32,9 @@ public class SystemHelper {
             System.out.print(ANSI_RESET);
     }
 
+    /**
+     * Prints a string in color and terminates current line.
+     */
     public static void println(String x, String color) {
         print(x, color);
         System.out.println();
@@ -65,13 +70,16 @@ public class SystemHelper {
     public static String scanString() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("> ");
-        return scanner.next().trim();
+        return scanner.next();
     }
 
-    public static void pressEnter() {
+    /**
+     * Prompt user to press enter
+     */
+    public static void scanEnter() {
         System.out.print("Press enter to continue");
         try {
             System.in.read();
-        } catch (IOException ignored) {}
+        } catch (Exception ignored) {}
     }
 }

@@ -1,14 +1,15 @@
 public class Player {
 
+    /* Player related variables */
     public String name;
     private final String color;
     private final boolean cpu;
 
+    /* Game related variables */
     public Deck deck;
     public Deck board;
     public Deck hand;
     public boolean stand;
-
     private int set;
 
 
@@ -28,6 +29,11 @@ public class Player {
         return cpu;
     }
 
+    public void setName(String name) {
+        if(!name.isEmpty())
+            this.name = name.trim();
+    }
+
     public int getSet() {
         return set;
     }
@@ -39,14 +45,16 @@ public class Player {
     }
 
     public void winGame() {
-        set = 3;
         System.out.print("\n   ");
         SystemHelper.println("   " + name + " wins the game!   ", color + SystemHelper.ANSI_WHITE_BOLD);
     }
 
+    /**
+     * Play a card from player's hand at specified index.
+     * @param cardIndex Index of the card to play.
+     */
     public void playCard(int cardIndex) {
         Card card = hand.remove(cardIndex);
-        if(card == null) return;
         if (card.isFlip())
             board.set(new Card(board.get(board.getLastIndex()).value * -1,
                     board.get(board.getLastIndex()).type),
@@ -105,7 +113,7 @@ public class Player {
     }
 
     /**
-     * Player actions. Returns true if player chose to stand.
+     * Prompts user to select action. Returns true if user chose to stand.
      */
     private boolean inputAction() {
         /* Put the user in a loop until action completes */
@@ -144,6 +152,9 @@ public class Player {
         }
     }
 
+    /**
+     * CPU actions. Returns true if cpu decides to stand.
+     */
     private boolean logicAction(Deck opponentBoard) {
         /* Stand if winning is guaranteed */
         if (board.sumValues() == 20)

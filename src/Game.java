@@ -7,6 +7,8 @@ public class Game {
 
     /**
      * Set up game and player decks.
+     * @param cpu1 Whether player 1 controlled by user or cpu.
+     * @param cpu2 Whether player 2 controlled by user or cpu.
      */
     public static void init(boolean cpu1, boolean cpu2) {
         /* initialize static variables */
@@ -54,11 +56,17 @@ public class Game {
 
     /**
      * Print out boards and hands of both players.
-     * @param showOpponentHand Whether to hide or show opponent hand.
      */
     public static void display(Player player, Player opponent, boolean showOpponentHand) {
-        //todo: print names
-        System.out.print("\nOpponent Hand      : ");
+        int labelLength = Math.max(player.name.length(), opponent.name.length());
+
+        /* Print opponent hand */
+        System.out.print("\n" + opponent.name + "'s Hand");
+        for (int i = 0; i < (labelLength - opponent.name.length() + 6); i++) {
+            System.out.print(" ");
+        }
+        System.out.print(": ");
+
         if (showOpponentHand) {
             opponent.hand.print();
         } else {
@@ -70,21 +78,43 @@ public class Game {
                 }
             }
         }
-        System.out.print("\nOpponent Board (" + String.format("%02d", opponent.board.sumValues()) + "): ");
+
+        /* Print opponent board */
+        System.out.print("\n" + opponent.name + "'s Board");
+        for (int i = 0; i < (labelLength - opponent.name.length()); i++) {
+            System.out.print(" ");
+        }
+        System.out.print(" (" + String.format("%02d", opponent.board.sumValues()) + "): ");
         opponent.board.print();
-        System.out.print("\nYour Board     (" + String.format("%02d", player.board.sumValues()) + "): ");
+
+        /* Print player board */
+        System.out.print("\n" + player.name + "'s Board");
+        for (int i = 0; i < (labelLength - player.name.length()); i++) {
+            System.out.print(" ");
+        }
+        System.out.print(" (" + String.format("%02d", player.board.sumValues()) + "): ");
         player.board.print();
-        System.out.print("\nYour Hand          : ");
+
+        /* Print player hand */
+        System.out.print("\n" + player.name + "'s Hand");
+        for (int i = 0; i < (labelLength - player.name.length() + 6); i++) {
+            System.out.print(" ");
+        }
+        System.out.print(": ");
         player.hand.print();
+
         System.out.println();
     }
 
     /**
-     * Returns true if set ended
+     * Handle player turn.
      */
     public static void playerTurn(Player player, Player opponent) {
-        if (Game.deck.getLastIndex() != -1)
+        if (Game.deck.getLastIndex() == -1) {
+            System.out.println("No cards left in game deck");
+        } else {
             player.board.add(deck.remove(deck.getLastIndex()));
+        }
 
         if (!player.isCpu())
             Game.display(player, opponent, false);
@@ -92,23 +122,27 @@ public class Game {
         player.stand = player.action(opponent.board);
     }
 
+    /**
+     * Game loop for a set
+     */
     public static void setLoop() {
-        player1.stand = false;
-        player2.stand = false;
-        /* Game loop for a set */
+        /* Loop until both players stand */
         do {
+            /* If game is PvP, wait for players to switch,
+            so they don't see each other's hand. */
             if(!(player1.isCpu() || player2.isCpu()))
-                SystemHelper.pressEnter();
+                SystemHelper.scanEnter();
 
             /* Player 1 turn */
             if (!player1.stand) {
                 playerTurn(player1, player2);
                 if (player1.checkBoard(player2))
+                    /* End set */
                     return;
             }
 
             if(!(player1.isCpu() || player2.isCpu()))
-                SystemHelper.pressEnter();
+                SystemHelper.scanEnter();
 
             /* Player 2 turn */
             if (!player2.stand) {
@@ -117,48 +151,55 @@ public class Game {
                     return;
             }
 
+            /* If game is CvC display the game after both
+            players' turn so viewers can see what is going on. */
             if (player1.isCpu() && player2.isCpu())
                 Game.display(player1, player2, true);
+
         } while (!(player1.stand && player2.stand));
         /* Set ended with both players standing */
 
         /* Check boards */
         System.out.print("   ");
         if (player1.board.sumValues() == player2.board.sumValues()) {
+            /* Tie condition */
             System.out.print("\n   ");
             SystemHelper.println("   Tie   ", SystemHelper.ANSI_WHITE_BOLD + SystemHelper.ANSI_GRAY_BG);
         } else if (20 - player1.board.sumValues() < 20 - player2.board.sumValues()) {
+            /* Player 1 wins */
             player1.winSet();
         } else {
+            /* Player 2 wins */
             player2.winSet();
         }
     }
 
     public static void gameLoop() {
-        /* The main game loop */
+        /* Loop until a player reaches score of 3 */
         while (player1.getSet() < 3 && player2.getSet() < 3) {
-            if (set == 10)
-                break;
-            System.out.println("\n   SET " + ++set + "   ");
+            /* Display set number */
+            SystemHelper.println("\n   SET " + ++set, SystemHelper.ANSI_WHITE_BOLD);
 
             /* Clean the board for the new set */
             player1.board.clear();
             player2.board.clear();
+            player1.stand = false;
+            player2.stand = false;
 
             setLoop();
 
+            /* Display the end result of the board after set ended */
             display(player1, player2, true);
 
-            //todo: make fancier
-            System.out.println(player1.getSet() + "-" + player2.getSet());
+            SystemHelper.println("   " + player1.getSet() + " - " + player2.getSet(),
+                    SystemHelper.ANSI_BLUE_BOLD);
         }
 
+        /* Check who wins */
         if (player1.getSet() == 3) {
             player1.winGame();
         } else {
             player2.winGame();
         }
-        /* Game ended */
     }
-
 }
