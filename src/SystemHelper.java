@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class SystemHelper {
@@ -65,5 +66,12 @@ public class SystemHelper {
         Scanner scanner = new Scanner(System.in);
         System.out.print("> ");
         return scanner.next().trim();
+    }
+
+    public static void pressEnter() {
+        System.out.print("Press enter to continue");
+        try {
+            System.in.read();
+        } catch (IOException ignored) {}
     }
 }

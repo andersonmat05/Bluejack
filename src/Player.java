@@ -7,6 +7,7 @@ public class Player {
     public Deck deck;
     public Deck board;
     public Deck hand;
+    public boolean stand;
 
     private int set;
 
@@ -19,7 +20,12 @@ public class Player {
         this.deck = new Deck();
         this.board = new Deck();
         this.hand = new Deck();
+        this.stand = false;
         this.set = 0;
+    }
+
+    public boolean isCpu() {
+        return cpu;
     }
 
     public int getSet() {
@@ -92,9 +98,9 @@ public class Player {
         return isAllBlue;
     }
 
-    public boolean action() {
+    public boolean action(Deck opponentBoard) {
         if(cpu)
-            return logicAction();
+            return logicAction(opponentBoard);
         return inputAction();
     }
 
@@ -138,8 +144,37 @@ public class Player {
         }
     }
 
-    private boolean logicAction() {
-        //todo: add actual logic
+    private boolean logicAction(Deck opponentBoard) {
+        /* Stand if winning is guaranteed */
+        if (board.sumValues() == 20)
+            return true;
+
+        /* Try to save if above 20 */
+        if (board.sumValues() > 20) {
+            if (hand.getLastIndex() == -1)
+                return false;
+
+            /* Select the best card to play */
+            boolean playCard = false;
+            int cardIndex = 0;
+            for (int i = 1; i <= hand.getLastIndex(); i++) {
+                int cardValue = hand.get(i).value;
+                if (cardValue <= 20 - hand.sumValues() &&
+                        cardValue < hand.get(cardIndex).value) {
+                    cardIndex = i;
+                    playCard = true;
+                }
+            }
+            if(playCard) {
+                playCard(cardIndex);
+                return false;
+            }
+            //todo: account for special cards
+        }
+        if (opponentBoard.sumValues() < board.sumValues()) {
+            if(board.sumValues() > 15)
+                return true;
+        }
         return false;
     }
 }

@@ -8,12 +8,21 @@ public class Main {
         SystemHelper.println("\n   WELCOME TO BLUEJACK", SystemHelper.ANSI_BLUE_BOLD);
         SystemHelper.println("      by Umut Göler\n", SystemHelper.ANSI_WHITE_BOLD);
 
-        Game.init();
+        System.out.println("0: Player VS CPU  1: Player VS Player  2: CPU VS CPU");
+        int gameMode = SystemHelper.scanIntRange(0,2);
+        switch (gameMode) {
+            case 0:
+                Game.init(false, true);
+                break;
+            case 1:
+                Game.init(false, false);
+                break;
+            case 2:
+                Game.init(true, true);
+        }
 
-        //todo: give option to play: player vs cpu, player vs player, cpu vs cpu
-
-        System.out.println("Enter player name");
-        Game.player1.name = SystemHelper.scanString();
+        //System.out.println("Enter player name");
+        //Game.player1.name = SystemHelper.scanString();
 
         Game.gameLoop();
     }

@@ -8,11 +8,11 @@ public class Game {
     /**
      * Set up game and player decks.
      */
-    public static void init() {
+    public static void init(boolean cpu1, boolean cpu2) {
         /* initialize static variables */
         deck = new Deck();
-        player1 = new Player("Player", SystemHelper.ANSI_POSITIVE_BG, true);
-        player2 = new Player("CPU", SystemHelper.ANSI_NEGATIVE_BG, true);
+        player1 = new Player("Player 1", SystemHelper.ANSI_POSITIVE_BG, cpu1);
+        player2 = new Player("Player 2", SystemHelper.ANSI_NEGATIVE_BG, cpu2);
         set = 0;
 
         /* Create the game deck and shuffle */
@@ -79,33 +79,47 @@ public class Game {
         System.out.println();
     }
 
+    /**
+     * Returns true if set ended
+     */
+    public static void playerTurn(Player player, Player opponent) {
+        if (Game.deck.getLastIndex() != -1)
+            player.board.add(deck.remove(deck.getLastIndex()));
+
+        if (!player.isCpu())
+            Game.display(player, opponent, false);
+
+        player.stand = player.action(opponent.board);
+    }
+
     public static void setLoop() {
-        boolean player1Stand = false;
-        boolean player2Stand = false;
+        player1.stand = false;
+        player2.stand = false;
         /* Game loop for a set */
         do {
+            if(!(player1.isCpu() || player2.isCpu()))
+                SystemHelper.pressEnter();
 
             /* Player 1 turn */
-            if (!player1Stand) {
-                player1.board.add(deck.remove(deck.getLastIndex()));
-
-                Game.display(player1, player2, false);
-
-                player1Stand = player1.action();
+            if (!player1.stand) {
+                playerTurn(player1, player2);
                 if (player1.checkBoard(player2))
-                    /* Set ended */
                     return;
             }
+
+            if(!(player1.isCpu() || player2.isCpu()))
+                SystemHelper.pressEnter();
 
             /* Player 2 turn */
-            if (!player2Stand) {
-                player2.board.add(deck.remove(deck.getLastIndex()));
-                player2Stand = player2.action();
+            if (!player2.stand) {
+                playerTurn(player2, player1);
                 if (player2.checkBoard(player1))
-                    /* Set ended */
                     return;
             }
-        } while (!(player1Stand && player2Stand));
+
+            if (player1.isCpu() && player2.isCpu())
+                Game.display(player1, player2, true);
+        } while (!(player1.stand && player2.stand));
         /* Set ended with both players standing */
 
         /* Check boards */
@@ -123,6 +137,8 @@ public class Game {
     public static void gameLoop() {
         /* The main game loop */
         while (player1.getSet() < 3 && player2.getSet() < 3) {
+            if (set == 10)
+                break;
             System.out.println("\n   SET " + ++set + "   ");
 
             /* Clean the board for the new set */
