@@ -139,14 +139,14 @@ public class Player {
                 return true;
             } else if (action == 2) {
                 /* Prompt user to choose a card index */
-                System.out.println("Choose card index (-1 to cancel)");
-                int cardIndex = SystemHelper.scanIntRange(-1, hand.getLastIndex());
-                if(cardIndex == -1) {
+                System.out.println("Choose card index (0 to cancel)");
+                int cardIndex = SystemHelper.scanIntRange(0, hand.getLastIndex()+1);
+                if(cardIndex == 0) {
                     /* Play card canceled, return back to action selection */
                     continue;
                 }
                 /* User chose a valid card to play, play the card and end the turn. */
-                playCard(cardIndex);
+                playCard(cardIndex-1);
                 return false;
             }
         }

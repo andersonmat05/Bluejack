@@ -58,7 +58,7 @@ public class Game {
     /**
      * Print out boards and hands of both players.
      */
-    public static void display(Player player, Player opponent, boolean showOpponentHand) {
+    public static void display(Player player, Player opponent, boolean showHand1, boolean showHand2) {
         int labelLength = Math.max(player.name.length(), opponent.name.length());
 
         /* Print opponent hand */
@@ -68,7 +68,7 @@ public class Game {
         }
         System.out.print(": ");
 
-        if (showOpponentHand) {
+        if (showHand2) {
             opponent.hand.print();
         } else {
             for (int i = 0; i <= opponent.hand.getLastIndex(); i++) {
@@ -102,8 +102,17 @@ public class Game {
             System.out.print(" ");
         }
         System.out.print(": ");
-        player.hand.print();
-
+        if (showHand1) {
+            player.hand.print();
+        } else {
+            for (int i = 0; i <= player.hand.getLastIndex(); i++) {
+                if (SystemHelper.getColorEnabled()) {
+                    System.out.print("[??]");
+                } else {
+                    System.out.print("[ ? ]");
+                }
+            }
+        }
         System.out.println();
     }
 
@@ -125,7 +134,7 @@ public class Game {
             player.board.add(deck.remove(deck.getLastIndex()));
 
         if (!player.isCpu())
-            Game.display(player, opponent, false);
+            Game.display(player, opponent, true, false);
 
         player.stand = player.action(opponent.board);
         if (player.stand)
@@ -164,7 +173,7 @@ public class Game {
             /* If game is CvC display the game after both
             players' turn so viewers can see what is going on. */
             if (player1.isCpu() && player2.isCpu())
-                Game.display(player1, player2, true);
+                Game.display(player1, player2, true, true);
 
         } while (!(player1.stand && player2.stand));
         /* Set ended with both players standing */
@@ -184,9 +193,13 @@ public class Game {
         }
     }
 
+    private static boolean gameLoopCondition() {
+        return Game.deck.getLastIndex() != -1 && (player1.getSet() < 3 && player2.getSet() < 3);
+    }
+
     public static void gameLoop() {
         /* Loop until a player reaches score of 3 */
-        while (player1.getSet() < 3 && player2.getSet() < 3) {
+        while (gameLoopCondition()) {
             /* Display set number */
             SystemHelper.println("\n   SET " + ++set, SystemHelper.ANSI_WHITE_BOLD);
 
@@ -198,18 +211,19 @@ public class Game {
 
             setLoop();
 
-            /* Display the end result of the board after set ended */
-            display(player1, player2, true);
+            /* Display the end result of the board after set ended, hide hands if game continues */
+            if (gameLoopCondition()) {
+                display(player1, player2, false, false);
+            } else {
+                display(player1, player2, true, true);
+
+            }
 
             SystemHelper.println("   " + player1.getSet() + " - " + player2.getSet(),
                     SystemHelper.ANSI_CYAN_BOLD);
 
             if (!(player1.isCpu() || player2.isCpu()))
                 SystemHelper.scanEnter();
-
-            /* Finish game if no cards remain in game deck */
-            if (Game.deck.getLastIndex() == -1)
-                break;
         }
         /* Game ended */
 
