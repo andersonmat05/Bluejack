@@ -4,7 +4,6 @@ public class Game {
     public static Player player1;
     public static Player player2;
     private static int set;
-    private static final int CLEAR_LENGHT = 32;
 
     /**
      * Set up game and player decks.
@@ -123,9 +122,6 @@ public class Game {
         /* If game is PvP, wait for players to switch,
         so they don't see each other's hand. */
         if(!(player.isCpu() || opponent.isCpu())) {
-            for (int i = 0; i < CLEAR_LENGHT; i++) {
-                System.out.println();
-            }
             System.out.print(player.name + "'s turn\n");
             SystemHelper.scanEnter();
         }

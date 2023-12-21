@@ -19,6 +19,8 @@ public class SystemHelper {
     private static final int HISTORY_SIZE = 10;
     private static final String HISTORY_FILE = "history.txt";
 
+    private static final int CLEAR_LENGHT = 32;
+
     private static boolean colorEnabled;
 
     public static void setColorEnabled(boolean newEnabled) {
@@ -27,6 +29,12 @@ public class SystemHelper {
 
     public static boolean getColorEnabled() {
         return colorEnabled;
+    }
+
+    public static void clear() {
+        for (int i = 0; i < CLEAR_LENGHT; i++) {
+            System.out.println();
+        }
     }
 
     /**

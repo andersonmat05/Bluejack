@@ -71,6 +71,9 @@ public class Player {
      * Returns true if handled.
      */
     public boolean checkBoard(Player opponent) {
+        if (!(isCpu() && opponent.isCpu())) {
+            SystemHelper.clear();
+        }
         if (board.sumValues() > 20) {
             SystemHelper.println("  " + name + " busted!", SystemHelper.ANSI_WHITE_BOLD);
             opponent.winSet();
