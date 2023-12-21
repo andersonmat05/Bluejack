@@ -123,21 +123,21 @@ public class Player {
              * any cards in their hand, do not show the play card option */
             int action;
             if (hand.getLastIndex() == -1) {
-                System.out.println("Choose action\n0: End  1: Stand");
-                action = SystemHelper.scanIntRange(0, 1);
+                System.out.println("Choose action\n1: End  2: Stand");
+                action = SystemHelper.scanIntRange(1, 2);
             } else {
-                System.out.println("Choose action\n0: End  1: Stand  2: Play Card");
-                action = SystemHelper.scanIntRange(0, 2);
+                System.out.println("Choose action\n1: End  2: Stand  3: Play Card");
+                action = SystemHelper.scanIntRange(1, 3);
             }
 
-            if (action == 0) {
+            if (action == 1) {
                 /* If player chooses to end the turn, we simply return false
                  * so game knows player is not standing yet. */
                 return false;
-            } else if (action == 1) {
+            } else if (action == 2) {
                 /* Return true so game loop knows player is standing. */
                 return true;
-            } else if (action == 2) {
+            } else if (action == 3) {
                 /* Prompt user to choose a card index */
                 System.out.println("Choose card index (0 to cancel)");
                 int cardIndex = SystemHelper.scanIntRange(0, hand.getLastIndex()+1);
@@ -234,10 +234,8 @@ public class Player {
                     // Check regular cards
                     int minCard = hand.minIndex();
                     if (minCard != -1) {
-                        if (hand.get(minCard).value < -3) {
-                            /* There is a strong negative, risk is low */
-                            return false;
-                        }
+                        /* There is a strong negative, risk is low */
+                        return hand.get(minCard).value >= -3;
                     }
                 }
                 /* Risk is too high */
