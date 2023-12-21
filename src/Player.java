@@ -72,12 +72,12 @@ public class Player {
      */
     public boolean checkBoard(Player opponent) {
         if (board.sumValues() > 20) {
-            System.out.println(name + " busted!");
+            SystemHelper.println("  " + name + " busted!", SystemHelper.ANSI_WHITE_BOLD);
             opponent.winSet();
             return true;
         }
         if (checkBluejack(board)) {
-            System.out.println("Bluejack!");
+            SystemHelper.println("  Bluejack!", SystemHelper.ANSI_BLUE_BOLD);
             set = 3;
             return true;
         }

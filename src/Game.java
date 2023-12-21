@@ -14,8 +14,8 @@ public class Game {
     public static void init(boolean cpu1, boolean cpu2) {
         /* initialize static variables */
         deck = new Deck();
-        player1 = new Player("Player 1", SystemHelper.ANSI_POSITIVE_BG, cpu1);
-        player2 = new Player("Player 2", SystemHelper.ANSI_NEGATIVE_BG, cpu2);
+        player1 = new Player("Player1", SystemHelper.ANSI_POSITIVE_BG, cpu1);
+        player2 = new Player("Player2", SystemHelper.ANSI_NEGATIVE_BG, cpu2);
         set = 0;
 
         /* Create the game deck and shuffle */
@@ -129,7 +129,7 @@ public class Game {
 
         player.stand = player.action(opponent.board);
         if (player.stand)
-            System.out.println("  " + player.name + " stands.");
+            SystemHelper.println("  " + player.name + " stands.", SystemHelper.ANSI_WHITE_BOLD);
     }
 
     /**
@@ -202,7 +202,7 @@ public class Game {
             display(player1, player2, true);
 
             SystemHelper.println("   " + player1.getSet() + " - " + player2.getSet(),
-                    SystemHelper.ANSI_BLUE_BOLD);
+                    SystemHelper.ANSI_CYAN_BOLD);
 
             if (!(player1.isCpu() || player2.isCpu()))
                 SystemHelper.scanEnter();
@@ -223,5 +223,7 @@ public class Game {
             System.out.print("\n   ");
             SystemHelper.println("   Tie   ", SystemHelper.ANSI_WHITE_BOLD + SystemHelper.ANSI_GRAY_BG);
         }
+
+        SystemHelper.saveResult(player1, player2);
     }
 }

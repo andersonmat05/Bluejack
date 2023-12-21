@@ -3,6 +3,7 @@ public class Main {
         boolean useArgs = false;
         int gameMode = 0;
 
+        /* Check if we can get the settings from args */
         if (args.length == 2) {
             try {
                 SystemHelper.setColorEnabled(Integer.parseInt(args[0]) == 1);
@@ -16,6 +17,7 @@ public class Main {
             }
         }
 
+        /* Args failed, prompt settings */
         if (!useArgs) {
             /* Prompt the user to enable or disable colors */
             System.out.println("0: Disable colors  1: Enable colors");
@@ -45,8 +47,8 @@ public class Main {
                 break;
             case 2:
                 Game.init(true, true);
-                Game.player1.setName("CPU 1");
-                Game.player2.setName("CPU 2");
+                Game.player1.setName("CPU1");
+                Game.player2.setName("CPU2");
         }
 
         Game.gameLoop();
