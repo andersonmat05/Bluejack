@@ -71,7 +71,7 @@ public class Player {
      * Returns true if handled.
      */
     public boolean checkBoard(Player opponent) {
-        if (!(isCpu() && opponent.isCpu())) {
+        if (!(isCpu() || opponent.isCpu())) {
             SystemHelper.clear();
         }
         if (board.sumValues() > 20) {
@@ -109,16 +109,10 @@ public class Player {
         return isAllBlue;
     }
 
-    public boolean action(Deck opponentBoard) {
-        if(cpu)
-            return logicAction(opponentBoard);
-        return inputAction();
-    }
-
     /**
      * Prompts user to select action. Returns true if user chose to stand.
      */
-    private boolean inputAction() {
+    public boolean inputAction() {
         /* Put the user in a loop until action completes */
         while (true) {
 
@@ -158,7 +152,7 @@ public class Player {
     /**
      * Returns the new sum if this card is played.
      */
-    private int playResult(Card card) {
+    private int getPlayResult(Card card) {
         if (card.type == 4) {
             return board.get(board.getLastIndex()).value * -1
                     + board.sumValues() - board.get(board.getLastIndex()).value;
@@ -174,7 +168,7 @@ public class Player {
     /**
      * CPU actions. Returns true if cpu decides to stand.
      */
-    private boolean logicAction(Deck opponentBoard) {
+    public boolean logicAction(Deck opponentBoard) {
         /* Stand if winning is guaranteed */
         if (board.sumValues() == 20)
             return true;
@@ -193,17 +187,17 @@ public class Player {
                 Card card = hand.get(i);
                 if (card.value == 0) {
                     /* Special card found */
-                    int currentSpecialResult = playResult(card);
+                    int currentSpecialResult = getPlayResult(card);
                     if (currentSpecialResult <= 20) {
                         // Check if it is better than last card
-                        if (playResult(hand.get(cardIndex)) < currentSpecialResult || !playCard) {
+                        if (getPlayResult(hand.get(cardIndex)) < currentSpecialResult || !playCard) {
                             cardIndex = i;
                             playCard = true;
                         }
                     }
                 } else {
                     /* Not special card */
-                    if (playResult(card) <= 20 &&
+                    if (getPlayResult(card) <= 20 &&
                             card.value < hand.get(cardIndex).value) {
                         cardIndex = i;
                         playCard = true;
@@ -255,7 +249,7 @@ public class Player {
             }
             if (doubleIndex != -1) {
                 /* Check the risk */
-                if (playResult(hand.get(doubleIndex)) < 15) {
+                if (getPlayResult(hand.get(doubleIndex)) < 15) {
                     /* Safe to play double */
                     playCard(doubleIndex);
                     return false;

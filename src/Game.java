@@ -116,7 +116,7 @@ public class Game {
     }
 
     /**
-     * Handle player turn.
+     * Handles a turn for a player.
      */
     public static void playerTurn(Player player, Player opponent) {
         /* If game is PvP, wait for players to switch,
@@ -132,7 +132,11 @@ public class Game {
         if (!player.isCpu())
             Game.display(player, opponent, true, false);
 
-        player.stand = player.action(opponent.board);
+        if (!player.isCpu()) {
+            player.stand = player.inputAction();
+        } else {
+            player.stand = player.logicAction(opponent.board);
+        }
         if (player.stand)
             SystemHelper.println("  " + player.name + " stands.", SystemHelper.ANSI_WHITE_BOLD);
     }
